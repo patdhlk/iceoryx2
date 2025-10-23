@@ -148,8 +148,8 @@ public sealed class ServiceBuilder
     internal static string GetRustCompatibleTypeName<T>() where T : unmanaged
     {
         var type = typeof(T);
-        
-        // Map .NET primitive types to Rust type names
+
+        // Map .NET primitive types to Rust type names (unchanged)
         if (type == typeof(byte)) return "u8";
         if (type == typeof(sbyte)) return "i8";
         if (type == typeof(short)) return "i16";
@@ -162,10 +162,31 @@ public sealed class ServiceBuilder
         if (type == typeof(double)) return "f64";
         if (type == typeof(bool)) return "bool";
         if (type == typeof(char)) return "char";
-        
-        // For custom structs, use the .NET type name
-        // Users can apply a custom attribute if they need a specific name
-        return type.Name;
+
+        // For custom structs, check for a custom Iox2TypeAttribute and then
+        // return the C-style length-prefixed name (e.g. "16TransmissionData").
+        var typeAttr = type.GetCustomAttributes(typeof(Iox2TypeAttribute), false);
+        string baseName;
+        if (typeAttr.Length > 0 && typeAttr[0] is Iox2TypeAttribute iox2Attr)
+        {
+            baseName = iox2Attr.TypeName;
+        }
+        else
+        {
+            baseName = type.Name;
+        }
+
+        // If the user already provided a length-prefixed name (starts with digits),
+        // assume it's already in the correct format and return as-is. Otherwise
+        // prefix with the UTF-8 byte length of the base name.
+        if (!string.IsNullOrEmpty(baseName) && char.IsDigit(baseName[0]))
+        {
+            return baseName;
+        }
+
+        // Use UTF-8 byte count for the base name length (matches C strlen behavior for ASCII/UTF-8)
+        var byteCount = System.Text.Encoding.UTF8.GetByteCount(baseName);
+        return $"{byteCount}{baseName}";
     }
 }
 
@@ -250,6 +271,7 @@ public sealed class PublishSubscribeServiceBuilder<T> where T : unmanaged
                     }
                 }
                 
+                Console.WriteLine($"[DEBUG] Setting payload type details: name='{typeName}', name_bytes={System.Text.Encoding.UTF8.GetByteCount(typeName)}, size={typeSize}, alignment={typeAlignment}");
                 var typeResult = Native.Iox2NativeMethods.iox2_service_builder_pub_sub_set_payload_type_details(
                     ref pubSubBuilderHandle,  // Pass by reference - C expects pointer to handle
                     Native.Iox2NativeMethods.iox2_type_variant_e.FIXED_SIZE,

@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Iceoryx2.Tests", "tests\Ice
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PublishSubscribe", "examples\PublishSubscribe\PublishSubscribe.csproj", "{D4E5F678-90AB-CDEF-1234-567890123456}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ComplexDataTypes", "examples\ComplexDataTypes\ComplexDataTypes.csproj", "{C9E9C880-E09E-4D1A-9E6D-F05849446CEC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RuntimeTest", "examples\RuntimeTest\RuntimeTest.csproj", "{9C2940D3-7D90-4E84-9EAF-4175F96DDE14}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,5 +31,13 @@ Global
 		{D4E5F678-90AB-CDEF-1234-567890123456}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D4E5F678-90AB-CDEF-1234-567890123456}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D4E5F678-90AB-CDEF-1234-567890123456}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C9E9C880-E09E-4D1A-9E6D-F05849446CEC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C9E9C880-E09E-4D1A-9E6D-F05849446CEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C9E9C880-E09E-4D1A-9E6D-F05849446CEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C9E9C880-E09E-4D1A-9E6D-F05849446CEC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C2940D3-7D90-4E84-9EAF-4175F96DDE14}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C2940D3-7D90-4E84-9EAF-4175F96DDE14}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C2940D3-7D90-4E84-9EAF-4175F96DDE14}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C2940D3-7D90-4E84-9EAF-4175F96DDE14}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

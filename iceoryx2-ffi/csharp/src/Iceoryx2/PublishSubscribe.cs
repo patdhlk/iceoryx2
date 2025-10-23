@@ -47,7 +47,9 @@ public sealed class Publisher : IDisposable
             
             if (result != Native.Iox2NativeMethods.IOX2_OK || sampleHandle == IntPtr.Zero)
                 return Result<Sample<T>, Iox2Error>.Err(Iox2Error.SampleLoanFailed);
-            
+
+            Console.WriteLine($"[DEBUG] Loan returned: result={result}, sampleHandle={sampleHandle}");
+
             var handle = new SafeSampleHandle(sampleHandle, isMutable: true);
             var sample = new Sample<T>(handle);
             
@@ -56,6 +58,44 @@ public sealed class Publisher : IDisposable
         catch (Exception)
         {
             return Result<Sample<T>, Iox2Error>.Err(Iox2Error.SampleLoanFailed);
+        }
+    }
+
+    /// <summary>
+    /// Send a copy of the provided managed struct via the native send-copy path.
+    /// This is a fallback that avoids the loan/send lifecycle and is useful for complex types.
+    /// </summary>
+    public Result<Unit, Iox2Error> SendCopy<T>(T value) where T : unmanaged
+    {
+        ThrowIfDisposed();
+
+        try
+        {
+            var publisherHandle = _handle.DangerousGetHandle();
+            var size = (ulong)Marshal.SizeOf<T>();
+            var tmp = Marshal.AllocHGlobal((int)size);
+            try
+            {
+                Marshal.StructureToPtr(value, tmp, false);
+                var result = Native.Iox2NativeMethods.iox2_publisher_send_copy(
+                    ref publisherHandle,
+                    tmp,
+                    (UIntPtr)size,
+                    IntPtr.Zero);
+
+                if (result != Native.Iox2NativeMethods.IOX2_OK)
+                    return Result<Unit, Iox2Error>.Err(Iox2Error.SendFailed);
+
+                return Result<Unit, Iox2Error>.Ok(Unit.Value);
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(tmp);
+            }
+        }
+        catch (Exception)
+        {
+            return Result<Unit, Iox2Error>.Err(Iox2Error.SendFailed);
         }
     }
 
@@ -174,10 +214,12 @@ public sealed class Sample<T> : IDisposable where T : unmanaged
                 ref sampleHandle,  // Pass by reference - C expects pointer to handle
                 out var payloadPtr,
                 out var payloadLen);
-            
+
+            Console.WriteLine($"[DEBUG] Payload.get: sampleHandle={sampleHandle}, payloadPtr={payloadPtr}, payloadLen={payloadLen}");
+
             if (payloadPtr == IntPtr.Zero)
                 throw new InvalidOperationException("Failed to get sample payload");
-            
+
             return Marshal.PtrToStructure<T>(payloadPtr);
         }
         set
@@ -188,11 +230,34 @@ public sealed class Sample<T> : IDisposable where T : unmanaged
                 ref sampleHandle,  // Pass by reference - C expects pointer to handle
                 out var payloadPtr,
                 out var payloadLen);
-            
+
+            Console.WriteLine($"[DEBUG] Payload.set: sampleHandle={sampleHandle}, payloadPtr={payloadPtr}, payloadLen={payloadLen}");
+
             if (payloadPtr == IntPtr.Zero)
                 throw new InvalidOperationException("Failed to get sample payload");
-            
-            Marshal.StructureToPtr(value, payloadPtr, false);
+
+            // Ensure we don't overwrite memory unexpectedly. Marshal the structure into a temporary
+            // unmanaged buffer and then copy the bytes into the payload pointer returned by native.
+            var structSize = Marshal.SizeOf<T>();
+            // payloadLen is the number of elements available; convert to available bytes
+            var availableElements = payloadLen.ToUInt64();
+            var availableBytes = availableElements * (ulong)structSize;
+            if ((ulong)structSize > availableBytes)
+                throw new InvalidOperationException($"Payload buffer too small: needed={structSize}, availableBytes={availableBytes} (elements={availableElements})");
+
+            var tmp = Marshal.AllocHGlobal(structSize);
+            try
+            {
+                Marshal.StructureToPtr(value, tmp, false);
+                unsafe
+                {
+                    Buffer.MemoryCopy(tmp.ToPointer(), payloadPtr.ToPointer(), (long)availableBytes, (long)structSize);
+                }
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(tmp);
+            }
         }
     }
 
@@ -205,8 +270,14 @@ public sealed class Sample<T> : IDisposable where T : unmanaged
         
         try
         {
+            var sampleHandle = _handle.DangerousGetHandle();
+            Console.WriteLine($"[DEBUG] About to send sample. handle={sampleHandle}");
+            // Re-query payload pointer to ensure sample is still valid
+            Native.Iox2NativeMethods.iox2_sample_mut_payload_mut(ref sampleHandle, out var ptrBeforeSend, out var lenBeforeSend);
+            Console.WriteLine($"[DEBUG] BeforeSend payload ptr={ptrBeforeSend}, len={lenBeforeSend}");
+
             var result = Native.Iox2NativeMethods.iox2_sample_mut_send(
-                _handle.DangerousGetHandle(),
+                sampleHandle,
                 IntPtr.Zero);
             
             if (result != Native.Iox2NativeMethods.IOX2_OK)

@@ -4,6 +4,13 @@ using Iceoryx2;
 
 namespace PublishSubscribeExample;
 
+class TransmissionData
+{
+    int x;
+    int y;
+    double funky;
+}
+
 /// <summary>
 /// Simple publish-subscribe example demonstrating zero-copy IPC in C#.
 /// This example mirrors the Rust/C++/Python examples.
@@ -72,12 +79,12 @@ class Program
                 .Expect("Failed to loan sample");
 
             sample.Payload = counter;
-            
+
             sample.Send()
                 .Expect("Failed to send sample");
 
             Console.WriteLine($"Sent: {counter}");
-            
+
             counter++;
             Thread.Sleep(1000);
         }
@@ -114,13 +121,13 @@ class Program
         while (true)
         {
             var receiveResult = subscriber.Receive<int>();
-            
+
             if (!receiveResult.IsOk)
             {
                 Console.WriteLine($"Error receiving: {receiveResult}");
                 break;
             }
-            
+
             var sampleResult = receiveResult.Unwrap();
 
             if (sampleResult != null)

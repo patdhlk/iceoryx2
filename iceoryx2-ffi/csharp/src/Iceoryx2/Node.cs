@@ -153,8 +153,10 @@ public sealed class NodeBuilder
             
             return Result<Node, Iox2Error>.Ok(node);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            Console.WriteLine($"[ERROR] Exception during node creation: {ex.Message}");
+            Console.WriteLine($"[ERROR] Stack trace: {ex.StackTrace}");
             return Result<Node, Iox2Error>.Err(Iox2Error.NodeCreationFailed);
         }
     }
