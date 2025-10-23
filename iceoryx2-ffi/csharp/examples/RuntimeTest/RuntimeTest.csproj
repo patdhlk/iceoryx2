@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../Iceoryx2.csproj" />
+  </ItemGroup>
+
+  <!-- Copy native library after build -->
+  <Target Name="CopyNativeLibrary" AfterTargets="Build">
+    <PropertyGroup>
+      <NativeLibrarySourcePath>$(MSBuildThisFileDirectory)../../../../target/release/libiceoryx2_ffi_c.dylib</NativeLibrarySourcePath>
+      <NativeLibrarySourcePathLinux>$(MSBuildThisFileDirectory)../../../../target/release/libiceoryx2_ffi_c.so</NativeLibrarySourcePathLinux>
+      <NativeLibrarySourcePathWindows>$(MSBuildThisFileDirectory)../../../../target/release/iceoryx2_ffi_c.dll</NativeLibrarySourcePathWindows>
+    </PropertyGroup>
+    
+    <!-- macOS -->
+    <Copy SourceFiles="$(NativeLibrarySourcePath)" 
+          DestinationFolder="$(OutputPath)" 
+          Condition="Exists('$(NativeLibrarySourcePath)')"
+          SkipUnchangedFiles="true" />
+    
+    <!-- Linux -->
+    <Copy SourceFiles="$(NativeLibrarySourcePathLinux)" 
+          DestinationFolder="$(OutputPath)" 
+          Condition="Exists('$(NativeLibrarySourcePathLinux)')"
+          SkipUnchangedFiles="true" />
+    
+    <!-- Windows -->
+    <Copy SourceFiles="$(NativeLibrarySourcePathWindows)" 
+          DestinationFolder="$(OutputPath)" 
+          Condition="Exists('$(NativeLibrarySourcePathWindows)')"
+          SkipUnchangedFiles="true" />
+  </Target>
+
+</Project>

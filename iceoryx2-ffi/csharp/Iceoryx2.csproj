@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    
+    <!-- Package Information -->
+    <PackageId>Iceoryx2</PackageId>
+    <Version>0.7.0</Version>
+    <Authors>Contributors to the Eclipse Foundation</Authors>
+    <Company>Eclipse iceoryx</Company>
+    <Description>Zero-Copy Lock-Free Inter-process Communication for .NET</Description>
+    <PackageLicenseExpression>Apache-2.0 OR MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/eclipse-iceoryx/iceoryx2</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/eclipse-iceoryx/iceoryx2</RepositoryUrl>
+    <PackageTags>ipc;inter-process-communication;zero-copy;shared-memory;publish-subscribe;request-response</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="src/**/*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+  <!-- Native library references for different platforms -->
+  <ItemGroup>
+    <None Include="runtimes/**/*.*" CopyToOutputDirectory="PreserveNewest" Pack="true" PackagePath="runtimes/" Condition="Exists('runtimes')" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Memory" Version="4.5.5" />
+  </ItemGroup>
+
+</Project>
