@@ -201,6 +201,24 @@ public sealed class Sample<T> : IDisposable where T : unmanaged
         _handle = handle ?? throw new ArgumentNullException(nameof(handle));
     }
 
+    private unsafe void DumpSampleMemory(string context)
+    {
+        var sampleHandle = _handle.DangerousGetHandle();
+        Console.WriteLine($"[DUMP] {context}: sampleHandle=0x{sampleHandle.ToInt64():X}");
+        
+        // Read first 128 bytes of the sample struct to see the service_type, storage bytes, and deleter
+        byte[] buffer = new byte[128];
+        Marshal.Copy(sampleHandle, buffer, 0, 128);
+        
+        Console.Write($"[DUMP] First 128 bytes: ");
+        for (int i = 0; i < Math.Min(128, buffer.Length); i++)
+        {
+            Console.Write($"{buffer[i]:X2} ");
+            if ((i + 1) % 16 == 0) Console.Write(" ");
+        }
+        Console.WriteLine();
+    }
+
     /// <summary>
     /// Gets or sets the payload data.
     /// </summary>
@@ -211,7 +229,7 @@ public sealed class Sample<T> : IDisposable where T : unmanaged
             ThrowIfDisposed();
             var sampleHandle = _handle.DangerousGetHandle();
             Native.Iox2NativeMethods.iox2_sample_payload(
-                ref sampleHandle,  // Pass by reference - C expects pointer to handle
+                ref sampleHandle,  // _ref type needs ref to pass pointer-to-pointer
                 out var payloadPtr,
                 out var payloadLen);
 
@@ -225,13 +243,24 @@ public sealed class Sample<T> : IDisposable where T : unmanaged
         set
         {
             ThrowIfDisposed();
+            
+            DumpSampleMemory("Before payload write");
+            
             var sampleHandle = _handle.DangerousGetHandle();
-            Native.Iox2NativeMethods.iox2_sample_mut_payload_mut(
-                ref sampleHandle,  // Pass by reference - C expects pointer to handle
-                out var payloadPtr,
-                out var payloadLen);
+            Console.WriteLine($"[DEBUG] About to call iox2_sample_mut_payload_mut with handle={sampleHandle}");
+            IntPtr payloadPtr;
+            unsafe
+            {
+                // WORKAROUND: Pass NULL for number_of_elements because native code has a bug
+                // where it accesses .local union variant even when service_type is IPC
+                Native.Iox2NativeMethods.iox2_sample_mut_payload_mut_ptr(
+                    ref sampleHandle,  // _ref type needs ref to pass pointer-to-pointer
+                    out payloadPtr,
+                    IntPtr.Zero);  // NULL - don't query element count due to native bug
+            }
+            Console.WriteLine($"[DEBUG] Returned from iox2_sample_mut_payload_mut");
 
-            Console.WriteLine($"[DEBUG] Payload.set: sampleHandle={sampleHandle}, payloadPtr={payloadPtr}, payloadLen={payloadLen}");
+            Console.WriteLine($"[DEBUG] Payload.set: sampleHandle={sampleHandle}, payloadPtr={payloadPtr}");
 
             if (payloadPtr == IntPtr.Zero)
                 throw new InvalidOperationException("Failed to get sample payload");
@@ -239,11 +268,8 @@ public sealed class Sample<T> : IDisposable where T : unmanaged
             // Ensure we don't overwrite memory unexpectedly. Marshal the structure into a temporary
             // unmanaged buffer and then copy the bytes into the payload pointer returned by native.
             var structSize = Marshal.SizeOf<T>();
-            // payloadLen is the number of elements available; convert to available bytes
-            var availableElements = payloadLen.ToUInt64();
-            var availableBytes = availableElements * (ulong)structSize;
-            if ((ulong)structSize > availableBytes)
-                throw new InvalidOperationException($"Payload buffer too small: needed={structSize}, availableBytes={availableBytes} (elements={availableElements})");
+            // We loaned exactly 1 element, so available bytes = structSize
+            var availableBytes = (ulong)structSize;
 
             var tmp = Marshal.AllocHGlobal(structSize);
             try
@@ -258,6 +284,8 @@ public sealed class Sample<T> : IDisposable where T : unmanaged
             {
                 Marshal.FreeHGlobal(tmp);
             }
+            
+            DumpSampleMemory("After payload write");
         }
     }
 
@@ -268,13 +296,12 @@ public sealed class Sample<T> : IDisposable where T : unmanaged
     {
         ThrowIfDisposed();
         
+        DumpSampleMemory("Before send");
+        
         try
         {
             var sampleHandle = _handle.DangerousGetHandle();
             Console.WriteLine($"[DEBUG] About to send sample. handle={sampleHandle}");
-            // Re-query payload pointer to ensure sample is still valid
-            Native.Iox2NativeMethods.iox2_sample_mut_payload_mut(ref sampleHandle, out var ptrBeforeSend, out var lenBeforeSend);
-            Console.WriteLine($"[DEBUG] BeforeSend payload ptr={ptrBeforeSend}, len={lenBeforeSend}");
 
             var result = Native.Iox2NativeMethods.iox2_sample_mut_send(
                 sampleHandle,

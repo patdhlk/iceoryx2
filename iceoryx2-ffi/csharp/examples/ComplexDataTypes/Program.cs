@@ -173,36 +173,26 @@ class Program
         Console.WriteLine("Publisher created successfully. Press Ctrl+C to stop.");
 
         var counter = 0;
-        while (true)
+        while (true)  // Loop indefinitely, use Ctrl+C to stop
         {
-            // For now use SendCopy fallback to avoid loan/send lifecycle bug
-            switch (typeof(T).Name)
+            // Create sample data
+            T data = typeof(T).Name switch
             {
-                case nameof(TransmissionData):
-                    var tData = new TransmissionData(counter, counter * 3, counter * 812.12);
-                    Console.WriteLine($"Sending(copy): {tData}");
-                    publisher.SendCopy(tData).Expect("Failed to send sample via SendCopy");
-                    break;
+                nameof(TransmissionData) => System.Runtime.CompilerServices.Unsafe.As<TransmissionData, T>(ref System.Runtime.CompilerServices.Unsafe.AsRef(new TransmissionData(counter, counter * 3, counter * 812.12))),
+                nameof(SensorData) => System.Runtime.CompilerServices.Unsafe.As<SensorData, T>(ref System.Runtime.CompilerServices.Unsafe.AsRef(new SensorData(
+                    DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                    20.0f + counter % 10,
+                    45.0f + counter % 30,
+                    counter % 5))),
+                nameof(Point3D) => System.Runtime.CompilerServices.Unsafe.As<Point3D, T>(ref System.Runtime.CompilerServices.Unsafe.AsRef(CreatePoint3D(counter, counter * 2.0f, counter * 3.0f, counter))),
+                _ => throw new InvalidOperationException($"Unknown type: {typeof(T).Name}")
+            };
 
-                case nameof(SensorData):
-                    var sData = new SensorData(
-                        DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
-                        20.0f + counter % 10,
-                        45.0f + counter % 30,
-                        counter % 5);
-                    Console.WriteLine($"Sending(copy): {sData}");
-                    publisher.SendCopy(sData).Expect("Failed to send sample via SendCopy");
-                    break;
+            Console.WriteLine($"Sending: {data}");
 
-                case nameof(Point3D):
-                    var pData = CreatePoint3D(counter, counter * 2.0f, counter * 3.0f, counter);
-                    Console.WriteLine($"Sending(copy): {pData}");
-                    publisher.SendCopy(pData).Expect("Failed to send sample via SendCopy");
-                    break;
-
-                default:
-                    throw new InvalidOperationException($"Unknown type: {typeof(T).Name}");
-            }
+            // Use SendCopy as workaround for native payload_mut bug
+            publisher.SendCopy(data)
+                .Expect("Failed to send sample");
 
             counter++;
             System.Threading.Thread.Sleep(1000);
