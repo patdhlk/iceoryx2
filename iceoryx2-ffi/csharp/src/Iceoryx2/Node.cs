@@ -121,27 +121,30 @@ public sealed class NodeBuilder
             // Set node name if provided
             if (!string.IsNullOrEmpty(_name))
             {
-                var nodeNameStruct = new Native.Iox2NativeMethods.iox2_node_name_t();
                 var result = Native.Iox2NativeMethods.iox2_node_name_new(
-                    ref nodeNameStruct,
+                    IntPtr.Zero,  // NULL - let C allocate the struct
                     _name,
-                    _name.Length,
+                    System.Text.Encoding.UTF8.GetByteCount(_name),
                     out var nodeNameHandle);
                 
                 if (result == Native.Iox2NativeMethods.IOX2_OK)
                 {
-                    Native.Iox2NativeMethods.iox2_node_builder_set_name(builderHandle, nodeNameHandle);
+                    var nodeNamePtr = Native.Iox2NativeMethods.iox2_cast_node_name_ptr(nodeNameHandle);
+                    Native.Iox2NativeMethods.iox2_node_builder_set_name(ref builderHandle, nodeNamePtr);
                     Native.Iox2NativeMethods.iox2_node_name_drop(nodeNameHandle);
                 }
             }
 
             // Create the node - pass IntPtr.Zero to let C FFI allocate the struct
+            var serviceType = Native.Iox2NativeMethods.iox2_service_type_e.IPC;
+            Console.WriteLine($"[DEBUG] Creating node with service type: {serviceType} (value={(int)serviceType})");
             var createResult = Native.Iox2NativeMethods.iox2_node_builder_create(
                 builderHandle,
                 IntPtr.Zero,  // NULL - let C allocate the struct on heap
-                Native.Iox2NativeMethods.iox2_service_type_e.IPC,
+                serviceType,
                 out var nodeHandle);
             
+            Console.WriteLine($"[DEBUG] Node created with result: {createResult}, handle: {nodeHandle}");
             if (createResult != Native.Iox2NativeMethods.IOX2_OK || nodeHandle == IntPtr.Zero)
                 return Result<Node, Iox2Error>.Err(Iox2Error.NodeCreationFailed);
 

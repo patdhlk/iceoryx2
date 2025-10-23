@@ -24,7 +24,6 @@ class Program
         }
 
         var mode = args[0].ToLower();
-
         switch (mode)
         {
             case "publisher":
@@ -114,13 +113,25 @@ class Program
         // Receive data
         while (true)
         {
-            var sampleResult = subscriber.Receive<int>()
-                .Expect("Failed to receive");
+            var receiveResult = subscriber.Receive<int>();
+            
+            if (!receiveResult.IsOk)
+            {
+                Console.WriteLine($"Error receiving: {receiveResult}");
+                break;
+            }
+            
+            var sampleResult = receiveResult.Unwrap();
 
             if (sampleResult != null)
             {
                 using var sample = sampleResult;
                 Console.WriteLine($"Received: {sample.Payload}");
+            }
+            else
+            {
+                // No sample available yet
+                Console.Write(".");
             }
 
             Thread.Sleep(100);

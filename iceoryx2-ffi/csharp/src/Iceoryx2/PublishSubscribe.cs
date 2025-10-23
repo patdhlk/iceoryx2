@@ -43,7 +43,7 @@ public sealed class Publisher : IDisposable
                 ref publisherHandle,  // Pass by reference - C expects pointer to handle
                 IntPtr.Zero,  // NULL - let C allocate the struct
                 out var sampleHandle,
-                1);
+                (UIntPtr)1);  // size_t in C = UIntPtr in C#
             
             if (result != Native.Iox2NativeMethods.IOX2_OK || sampleHandle == IntPtr.Zero)
                 return Result<Sample<T>, Iox2Error>.Err(Iox2Error.SampleLoanFailed);
@@ -99,10 +99,16 @@ public sealed class Subscriber : IDisposable
         {
             // Receive sample - pass by reference for subscriber handle
             var subscriberHandle = _handle.DangerousGetHandle();
+            
+            // Debug: Log the handle value
+            Console.WriteLine($"[DEBUG] Calling receive with handle: {subscriberHandle}");
+            
             var result = Native.Iox2NativeMethods.iox2_subscriber_receive(
                 ref subscriberHandle,  // Pass by reference - C expects pointer to handle
                 IntPtr.Zero,  // NULL - let C allocate the struct
                 out var sampleHandle);
+            
+            Console.WriteLine($"[DEBUG] Receive returned: result={result}, sampleHandle={sampleHandle}");
             
             // No sample available is not an error
             if (result != Native.Iox2NativeMethods.IOX2_OK)
