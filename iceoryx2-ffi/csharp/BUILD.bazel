@@ -1,0 +1,92 @@
+# Copyright (c) 2025 Contributors to the Eclipse Foundation
+#
+# See the NOTICE file(s) distributed with this work for additional
+# information regarding copyright ownership.
+#
+# This program and the accompanying materials are made available under the
+# terms of the Apache Software License 2.0 which is available at
+# https://www.apache.org/licenses/LICENSE-2.0, or the MIT license
+# which is available at https://opensource.org/licenses/MIT.
+#
+# SPDX-License-Identifier: Apache-2.0 OR MIT
+
+package(default_visibility = ["//visibility:public"])
+
+# Note: Full rules_dotnet integration requires adding rules_dotnet to MODULE.bazel.
+# To enable Bazel builds for C#:
+#
+# 1. Add to MODULE.bazel:
+#    bazel_dep(name = "rules_dotnet", version = "0.15.1")
+#    dotnet = use_extension("@rules_dotnet//dotnet:extensions.bzl", "dotnet")
+#    dotnet.toolchain(dotnet_version = "8.0.100")
+#    use_repo(dotnet, "dotnet_toolchains")
+#    register_toolchains("@dotnet_toolchains//:all")
+#
+# 2. Then uncomment the targets below.
+#
+# For now, use the .NET SDK build system: dotnet build
+
+filegroup(
+    name = "all_srcs",
+    srcs = glob(["**"]),
+)
+
+filegroup(
+    name = "iceoryx2-ffi-csharp-src",
+    srcs = glob([
+        "src/**/*.cs",
+        "*.csproj",
+        "*.sln",
+    ]),
+)
+
+filegroup(
+    name = "iceoryx2-ffi-csharp-examples",
+    srcs = glob([
+        "examples/**/*.cs",
+        "examples/**/*.csproj",
+    ]),
+)
+
+filegroup(
+    name = "iceoryx2-ffi-csharp-tests",
+    srcs = glob([
+        "tests/**/*.cs",
+        "tests/**/*.csproj",
+    ]),
+)
+
+# TODO: Uncomment when rules_dotnet is configured in MODULE.bazel
+#
+# load("@rules_dotnet//dotnet:defs.bzl", "csharp_library", "csharp_binary", "csharp_nunit_test")
+#
+# csharp_library(
+#     name = "iceoryx2-ffi-csharp-lib",
+#     srcs = glob([
+#         "src/**/*.cs",
+#     ]),
+#     target_frameworks = ["net8.0"],
+#     deps = [
+#         # Depends on the native C FFI library
+#         "//iceoryx2-ffi/c:iceoryx2-ffi-c-shared",
+#     ],
+# )
+#
+# csharp_binary(
+#     name = "publish-subscribe-example",
+#     srcs = glob(["examples/PublishSubscribe/**/*.cs"]),
+#     target_frameworks = ["net8.0"],
+#     deps = [
+#         ":iceoryx2-ffi-csharp-lib",
+#     ],
+# )
+#
+# csharp_nunit_test(
+#     name = "iceoryx2-ffi-csharp-tests",
+#     srcs = glob(["tests/**/*.cs"]),
+#     target_frameworks = ["net8.0"],
+#     deps = [
+#         ":iceoryx2-ffi-csharp-lib",
+#     ],
+# )
+
