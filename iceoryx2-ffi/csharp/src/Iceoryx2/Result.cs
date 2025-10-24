@@ -116,33 +116,3 @@ public readonly struct Result<T, E>
         return _isOk ? $"Ok({_value})" : $"Err({_error})";
     }
 }
-
-/// <summary>
-/// Common error types for iceoryx2 operations.
-/// </summary>
-public enum Iox2Error
-{
-    NodeCreationFailed,
-    ServiceCreationFailed,
-    PublisherCreationFailed,
-    SubscriberCreationFailed,
-    SampleLoanFailed,
-    SendFailed,
-    ReceiveFailed,
-    InvalidHandle,
-    Unknown
-}
-
-/// <summary>
-/// Extension methods for Result types.
-/// </summary>
-public static class ResultExtensions
-{
-    /// <summary>
-    /// Converts a nullable reference to a Result.
-    /// </summary>
-    public static Result<T, E> ToResult<T, E>(this T? value, E error) where T : class
-    {
-        return value != null ? Result<T, E>.Ok(value) : Result<T, E>.Err(error);
-    }
-}
