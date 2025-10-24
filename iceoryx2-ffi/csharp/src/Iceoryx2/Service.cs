@@ -105,6 +105,11 @@ public sealed class Service : IDisposable
         }
     }
 
+    /// <summary>
+    /// Releases all resources used by the service instance.
+    /// This method should be called to clean up any unmanaged resources
+    /// and mark the object as disposed to prevent further usage.
+    /// </summary>
     public void Dispose()
     {
         if (!_disposed)

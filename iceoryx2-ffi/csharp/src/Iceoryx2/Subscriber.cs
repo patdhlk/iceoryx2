@@ -59,6 +59,10 @@ public sealed class Subscriber : IDisposable
         }
     }
 
+    /// <summary>
+    /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+    /// Ensures proper cleanup by disposing of the associated resources when the object is no longer needed.
+    /// </summary>
     public void Dispose()
     {
         if (!_disposed)

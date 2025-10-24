@@ -99,6 +99,9 @@ public sealed class Publisher : IDisposable
         }
     }
 
+    /// <summary>
+    /// Disposes of the resources used by the Publisher instance.
+    /// </summary>
     public void Dispose()
     {
         if (!_disposed)

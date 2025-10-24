@@ -111,6 +111,12 @@ public readonly struct Result<T, E>
         return _isOk ? Result<T, ENew>.Ok(_value!) : Result<T, ENew>.Err(mapper(_error!));
     }
 
+    /// <summary>
+    /// Returns a string representation of the result, indicating whether it is a success or an error.
+    /// </summary>
+    /// <returns>
+    /// A string in the format "Ok(value)" if the result is a success, or "Err(error)" if the result is an error.
+    /// </returns>
     public override string ToString()
     {
         return _isOk ? $"Ok({_value})" : $"Err({_error})";

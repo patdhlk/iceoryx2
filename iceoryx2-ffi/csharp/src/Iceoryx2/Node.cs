@@ -15,8 +15,9 @@ using System;
 namespace Iceoryx2;
 
 /// <summary>
-/// Represents a node in the iceoryx2 system.
-/// A node is the central entry point and represents a process in the iceoryx2 ecosystem.
+/// Represents a node in the Iceoryx2 system.
+/// The node serves as a central entry point and is linked to a specific process within the Iceoryx2 ecosystem.
+/// It provides capabilities for creating or opening services and managing node-specific resources.
 /// </summary>
 public sealed class Node : IDisposable
 {
@@ -63,6 +64,9 @@ public sealed class Node : IDisposable
         return new ServiceBuilder(this);
     }
 
+    /// <summary>
+    /// Releases the unmanaged resources used by the Node and optionally releases the managed resources.
+    /// </summary>
     public void Dispose()
     {
         if (!_disposed)

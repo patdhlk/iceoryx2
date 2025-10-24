@@ -137,6 +137,9 @@ public sealed class Sample<T> : IDisposable where T : unmanaged
         }
     }
 
+    /// <summary>
+    /// Releases the resources associated with the current instance of the Sample class.
+    /// </summary>
     public void Dispose()
     {
         if (!_disposed)

@@ -4,13 +4,6 @@ using Iceoryx2;
 
 namespace PublishSubscribeExample;
 
-class TransmissionData
-{
-    int x;
-    int y;
-    double funky;
-}
-
 /// <summary>
 /// Simple publish-subscribe example demonstrating zero-copy IPC in C#.
 /// This example mirrors the Rust/C++/Python examples.
