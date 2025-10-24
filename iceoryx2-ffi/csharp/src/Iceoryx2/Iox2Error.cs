@@ -56,6 +56,41 @@ public enum Iox2Error
     ReceiveFailed,
 
     /// <summary>
+    /// Indicates a failure during the creation of a notifier.
+    /// This error may occur when the system cannot allocate the required resources
+    /// or establish the notifier for event-based communication.
+    /// </summary>
+    NotifierCreationFailed,
+
+    /// <summary>
+    /// Indicates a failure during the creation of a listener.
+    /// This error may occur when the system cannot allocate the required resources
+    /// or establish the listener for event-based communication.
+    /// </summary>
+    ListenerCreationFailed,
+
+    /// <summary>
+    /// Represents an error condition where the notify operation failed.
+    /// This error may occur if the event notification cannot be sent to listeners
+    /// due to issues like communication breakdown or invalid event ID.
+    /// </summary>
+    NotifyFailed,
+
+    /// <summary>
+    /// Represents an error condition where waiting for an event failed.
+    /// This error may occur if the listener encounters an issue while waiting
+    /// for event notifications, such as timeout or internal failure.
+    /// </summary>
+    WaitFailed,
+
+    /// <summary>
+    /// Indicates a failure during the creation of an event service.
+    /// This error is encountered when the necessary resources or configurations
+    /// required to establish the event service cannot be fulfilled.
+    /// </summary>
+    EventServiceCreationFailed,
+
+    /// <summary>
     /// Indicates that an operation failed due to an invalid handle being used.
     /// This error typically occurs when a handle provided to the system is
     /// unrecognized, uninitialized, or no longer valid.

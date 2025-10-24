@@ -23,6 +23,14 @@ public sealed class ServiceBuilder
     }
 
     /// <summary>
+    /// Creates an event service builder.
+    /// </summary>
+    public EventServiceBuilder Event()
+    {
+        return new EventServiceBuilder(_node);
+    }
+
+    /// <summary>
     /// Gets a Rust-compatible type name for cross-language interoperability.
     /// Maps .NET types to their Rust equivalents for iceoryx2 type matching.
     /// </summary>
