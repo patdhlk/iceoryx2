@@ -87,7 +87,7 @@ You should see the subscriber receiving incrementing counter values from the pub
 
 ## Prerequisites
 
-- **.NET 8.0 SDK or later** ([Download](https://dotnet.microsoft.com/download))
+- **.NET 8.0 or .NET 9.0 SDK** ([Download](https://dotnet.microsoft.com/download))
 - **Rust toolchain** (for building the iceoryx2 C FFI library) - Install via [rustup](https://rustup.rs/)
 - **C compiler** (gcc/clang on Linux/macOS, MSVC on Windows)
 - **CMake** (optional, for C examples and tests)
@@ -96,7 +96,7 @@ You should see the subscriber receiving incrementing counter values from the pub
 
 ### Prerequisites
 
-- **.NET 8.0 SDK or later** ([Download](https://dotnet.microsoft.com/download))
+- **.NET 8.0 or .NET 9.0 SDK** ([Download](https://dotnet.microsoft.com/download))
 - **Rust toolchain** (for building the C FFI library)
 - **C compiler** (gcc/clang on Linux/macOS, MSVC on Windows)
 

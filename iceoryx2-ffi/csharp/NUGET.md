@@ -71,14 +71,26 @@ dotnet add package Iceoryx2 --version 0.7.0
 
 The NuGet package includes:
 
-- **Managed Assembly**: `lib/net8.0/Iceoryx2.dll` - The .NET 8.0 wrapper library
-- **XML Documentation**: `lib/net8.0/Iceoryx2.xml` - IntelliSense documentation
+- **Managed Assemblies**: 
+  - `lib/net8.0/Iceoryx2.dll` - The .NET 8.0 wrapper library
+  - `lib/net9.0/Iceoryx2.dll` - The .NET 9.0 wrapper library
+- **XML Documentation**: 
+  - `lib/net8.0/Iceoryx2.xml` - IntelliSense documentation for .NET 8
+  - `lib/net9.0/Iceoryx2.xml` - IntelliSense documentation for .NET 9
 - **Native Libraries**:
   - `runtimes/osx-x64/native/libiceoryx2_ffi_c.dylib` - macOS x64
   - `runtimes/osx-arm64/native/libiceoryx2_ffi_c.dylib` - macOS ARM64
   - `runtimes/linux-x64/native/libiceoryx2_ffi_c.so` - Linux x64
   - `runtimes/win-x64/native/iceoryx2_ffi_c.dll` - Windows x64
 - **README.md**: Package documentation
+
+## Target Framework Support
+
+The package supports multiple .NET versions:
+- **.NET 8.0** (net8.0) - LTS release
+- **.NET 9.0** (net9.0) - Latest release
+
+When you reference the package, NuGet automatically selects the appropriate version for your project's target framework. Projects targeting .NET 8 will use `lib/net8.0/Iceoryx2.dll`, while .NET 9 projects will use `lib/net9.0/Iceoryx2.dll`.
 
 ## Native Library Loading
 
