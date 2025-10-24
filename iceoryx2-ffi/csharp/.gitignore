@@ -37,6 +37,3 @@ packages/
 *.so
 *.dylib
 runtimes/
-
-# Auto-generated files
-src/Iceoryx2/Native/Iox2NativeMethods.cs
