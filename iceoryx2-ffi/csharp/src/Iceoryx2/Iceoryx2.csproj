@@ -19,15 +19,42 @@
     <RepositoryUrl>https://github.com/eclipse-iceoryx/iceoryx2</RepositoryUrl>
     <PackageTags>ipc;inter-process-communication;zero-copy;shared-memory;publish-subscribe;request-response</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryType>git</RepositoryType>
+    <PackageReleaseNotes>See CHANGELOG.md for release notes</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Include="**/*.cs" Exclude="bin/**;obj/**" />
   </ItemGroup>
 
-  <!-- Native library references for different platforms -->
+  <!-- Include README and icon in package -->
   <ItemGroup>
-    <None Include="runtimes/**/*.*" CopyToOutputDirectory="PreserveNewest" Pack="true" PackagePath="runtimes/" Condition="Exists('runtimes')" />
+    <None Include="../../README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+  <!-- Package native libraries for different platforms -->
+  <ItemGroup>
+    <!-- macOS (osx-x64 and osx-arm64) -->
+    <None Include="../../../../target/release/libiceoryx2_ffi_c.dylib" 
+          Pack="true" 
+          PackagePath="runtimes/osx-x64/native/libiceoryx2_ffi_c.dylib"
+          Condition="Exists('../../../../target/release/libiceoryx2_ffi_c.dylib')" />
+    <None Include="../../../../target/release/libiceoryx2_ffi_c.dylib" 
+          Pack="true" 
+          PackagePath="runtimes/osx-arm64/native/libiceoryx2_ffi_c.dylib"
+          Condition="Exists('../../../../target/release/libiceoryx2_ffi_c.dylib')" />
+    
+    <!-- Linux x64 -->
+    <None Include="../../../../target/release/libiceoryx2_ffi_c.so" 
+          Pack="true" 
+          PackagePath="runtimes/linux-x64/native/libiceoryx2_ffi_c.so"
+          Condition="Exists('../../../../target/release/libiceoryx2_ffi_c.so')" />
+    
+    <!-- Windows x64 -->
+    <None Include="../../../../target/release/iceoryx2_ffi_c.dll" 
+          Pack="true" 
+          PackagePath="runtimes/win-x64/native/iceoryx2_ffi_c.dll"
+          Condition="Exists('../../../../target/release/iceoryx2_ffi_c.dll')" />
   </ItemGroup>
 
   <ItemGroup>
@@ -38,9 +65,9 @@
   <Target Name="CopyNativeLibrary" AfterTargets="Build">
     <PropertyGroup>
       <!-- Path relative to this .csproj file location (src/Iceoryx2/) -->
-      <NativeLibrarySourcePath>$(MSBuildThisFileDirectory)../../../../../target/release/libiceoryx2_ffi_c.dylib</NativeLibrarySourcePath>
-      <NativeLibrarySourcePathLinux>$(MSBuildThisFileDirectory)../../../../../target/release/libiceoryx2_ffi_c.so</NativeLibrarySourcePathLinux>
-      <NativeLibrarySourcePathWindows>$(MSBuildThisFileDirectory)../../../../../target/release/iceoryx2_ffi_c.dll</NativeLibrarySourcePathWindows>
+      <NativeLibrarySourcePath>$(MSBuildThisFileDirectory)../../../../target/release/libiceoryx2_ffi_c.dylib</NativeLibrarySourcePath>
+      <NativeLibrarySourcePathLinux>$(MSBuildThisFileDirectory)../../../../target/release/libiceoryx2_ffi_c.so</NativeLibrarySourcePathLinux>
+      <NativeLibrarySourcePathWindows>$(MSBuildThisFileDirectory)../../../../target/release/iceoryx2_ffi_c.dll</NativeLibrarySourcePathWindows>
     </PropertyGroup>
     
     <!-- macOS -->

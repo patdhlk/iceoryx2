@@ -38,14 +38,33 @@ This package provides C# and .NET bindings for iceoryx2, enabling zero-copy inte
 
 ## Quick Start
 
-### 1. Build the Native Library
+### Option 1: Install from NuGet (Recommended)
+
+```bash
+dotnet add package Iceoryx2
+```
+
+Or add to your `.csproj`:
+```xml
+<ItemGroup>
+  <PackageReference Include="Iceoryx2" Version="0.7.0" />
+</ItemGroup>
+```
+
+The NuGet package includes pre-built native libraries for macOS, Linux, and Windows.
+
+See [NUGET.md](NUGET.md) for detailed package information.
+
+### Option 2: Build from Source
+
+#### 1. Build the Native Library
 
 ```bash
 # From repository root
 cargo build --release --package iceoryx2-ffi-c
 ```
 
-### 2. Build the C# Bindings
+#### 2. Build the C# Bindings
 
 ```bash
 cd iceoryx2-ffi/csharp
