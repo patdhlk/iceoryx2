@@ -34,4 +34,32 @@
     <PackageReference Include="System.Memory" Version="4.5.5" />
   </ItemGroup>
 
+  <!-- Copy native library to output directory of any project referencing this library -->
+  <Target Name="CopyNativeLibrary" AfterTargets="Build">
+    <PropertyGroup>
+      <!-- Path relative to this .csproj file location (src/Iceoryx2/) -->
+      <NativeLibrarySourcePath>$(MSBuildThisFileDirectory)../../../../../target/release/libiceoryx2_ffi_c.dylib</NativeLibrarySourcePath>
+      <NativeLibrarySourcePathLinux>$(MSBuildThisFileDirectory)../../../../../target/release/libiceoryx2_ffi_c.so</NativeLibrarySourcePathLinux>
+      <NativeLibrarySourcePathWindows>$(MSBuildThisFileDirectory)../../../../../target/release/iceoryx2_ffi_c.dll</NativeLibrarySourcePathWindows>
+    </PropertyGroup>
+    
+    <!-- macOS -->
+    <Copy SourceFiles="$(NativeLibrarySourcePath)" 
+          DestinationFolder="$(OutputPath)" 
+          Condition="Exists('$(NativeLibrarySourcePath)')"
+          SkipUnchangedFiles="true" />
+    
+    <!-- Linux -->
+    <Copy SourceFiles="$(NativeLibrarySourcePathLinux)" 
+          DestinationFolder="$(OutputPath)" 
+          Condition="Exists('$(NativeLibrarySourcePathLinux)')"
+          SkipUnchangedFiles="true" />
+    
+    <!-- Windows -->
+    <Copy SourceFiles="$(NativeLibrarySourcePathWindows)" 
+          DestinationFolder="$(OutputPath)" 
+          Condition="Exists('$(NativeLibrarySourcePathWindows)')"
+          SkipUnchangedFiles="true" />
+  </Target>
+
 </Project>
