@@ -175,7 +175,14 @@ class Program
         var counter = 0;
         while (true)  // Loop indefinitely, use Ctrl+C to stop
         {
-            // Create sample data
+            // Loan a sample (matches C: iox2_publisher_loan_slice_uninit(&publisher, NULL, &sample, 1))
+            var sample = publisher.Loan<T>()
+                .Expect("Failed to loan sample");
+
+            // Create payload data and write to sample
+            // This matches C pattern: 
+            //   iox2_sample_mut_payload_mut(&sample, (void**)&payload, NULL);
+            //   payload->x = counter; ...
             T data = typeof(T).Name switch
             {
                 nameof(TransmissionData) => System.Runtime.CompilerServices.Unsafe.As<TransmissionData, T>(ref System.Runtime.CompilerServices.Unsafe.AsRef(new TransmissionData(counter, counter * 3, counter * 812.12))),
@@ -188,10 +195,12 @@ class Program
                 _ => throw new InvalidOperationException($"Unknown type: {typeof(T).Name}")
             };
 
+            sample.Payload = data;  // Write to the loaned sample's payload
+
             Console.WriteLine($"Sending: {data}");
 
-            // Use SendCopy as workaround for native payload_mut bug
-            publisher.SendCopy(data)
+            // Send the sample (matches C: iox2_sample_mut_send(sample, NULL))
+            sample.Send()
                 .Expect("Failed to send sample");
 
             counter++;
