@@ -183,15 +183,19 @@ class Program
             // This matches C pattern: 
             //   iox2_sample_mut_payload_mut(&sample, (void**)&payload, NULL);
             //   payload->x = counter; ...
+            var transmissionData = new TransmissionData(counter, counter * 3, counter * 812.12);
+            var sensorData = new SensorData(
+                DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                20.0f + counter % 10,
+                45.0f + counter % 30,
+                counter % 5);
+            var point3D = CreatePoint3D(counter, counter * 2.0f, counter * 3.0f, counter);
             T data = typeof(T).Name switch
             {
-                nameof(TransmissionData) => System.Runtime.CompilerServices.Unsafe.As<TransmissionData, T>(ref System.Runtime.CompilerServices.Unsafe.AsRef(new TransmissionData(counter, counter * 3, counter * 812.12))),
-                nameof(SensorData) => System.Runtime.CompilerServices.Unsafe.As<SensorData, T>(ref System.Runtime.CompilerServices.Unsafe.AsRef(new SensorData(
-                    DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
-                    20.0f + counter % 10,
-                    45.0f + counter % 30,
-                    counter % 5))),
-                nameof(Point3D) => System.Runtime.CompilerServices.Unsafe.As<Point3D, T>(ref System.Runtime.CompilerServices.Unsafe.AsRef(CreatePoint3D(counter, counter * 2.0f, counter * 3.0f, counter))),
+                nameof(TransmissionData) => System.Runtime.CompilerServices.Unsafe.As<TransmissionData, T>(ref System.Runtime.CompilerServices.Unsafe.AsRef(in transmissionData)),
+            
+                nameof(SensorData) => System.Runtime.CompilerServices.Unsafe.As<SensorData, T>(ref System.Runtime.CompilerServices.Unsafe.AsRef(in sensorData)),
+                nameof(Point3D) => System.Runtime.CompilerServices.Unsafe.As<Point3D, T>(ref System.Runtime.CompilerServices.Unsafe.AsRef(in point3D)),
                 _ => throw new InvalidOperationException($"Unknown type: {typeof(T).Name}")
             };
 
