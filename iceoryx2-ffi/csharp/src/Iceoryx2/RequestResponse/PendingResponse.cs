@@ -11,6 +11,8 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Iceoryx2.SafeHandles;
 using static Iceoryx2.Native.Iox2NativeMethods;
 
@@ -118,8 +120,76 @@ public sealed class PendingResponse<TResponse> : IDisposable
     }
 
     /// <summary>
+    /// Asynchronously waits for a response with a timeout.
+    /// This is the async version that yields to the thread pool instead of blocking.
+    /// </summary>
+    /// <param name="timeout">The maximum time to wait for a response.</param>
+    /// <param name="cancellationToken">Optional cancellation token to cancel the wait operation.</param>
+    /// <returns>A Task containing a Result with the response if received within timeout (null if timeout), or an error.</returns>
+    public async Task<Result<Response<TResponse>?, Iox2Error>> ReceiveAsync(TimeSpan timeout, CancellationToken cancellationToken = default)
+    {
+        ThrowIfDisposed();
+
+        var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+        
+        while (stopwatch.Elapsed < timeout)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var result = Receive();
+            if (!result.IsOk)
+            {
+                return result;
+            }
+
+            var response = result.Unwrap();
+            if (response != null)
+            {
+                return Result<Response<TResponse>?, Iox2Error>.Ok(response);
+            }
+
+            // Yield to thread pool instead of blocking
+            await Task.Delay(10, cancellationToken).ConfigureAwait(false);
+        }
+
+        return Result<Response<TResponse>?, Iox2Error>.Ok(null);
+    }
+
+    /// <summary>
+    /// Asynchronously waits for a response indefinitely.
+    /// This is the async version that yields to the thread pool instead of blocking.
+    /// </summary>
+    /// <param name="cancellationToken">Optional cancellation token to cancel the wait operation.</param>
+    /// <returns>A Task containing a Result with the response or an error.</returns>
+    public async Task<Result<Response<TResponse>, Iox2Error>> ReceiveAsync(CancellationToken cancellationToken = default)
+    {
+        ThrowIfDisposed();
+
+        while (true)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var result = Receive();
+            if (!result.IsOk)
+            {
+                return Result<Response<TResponse>, Iox2Error>.Err(Iox2Error.ResponseReceiveFailed);
+            }
+
+            var response = result.Unwrap();
+            if (response != null)
+            {
+                return Result<Response<TResponse>, Iox2Error>.Ok(response);
+            }
+
+            // Yield to thread pool instead of blocking
+            await Task.Delay(10, cancellationToken).ConfigureAwait(false);
+        }
+    }
+
+    /// <summary>
     /// Blocks until a response is received by polling.
     /// Note: This is implemented as a polling loop since the native API doesn't have blocking receive.
+    /// Consider using ReceiveAsync() for better thread pool utilization.
     /// </summary>
     /// <returns>A Result containing the response or an error.</returns>
     public Result<Response<TResponse>, Iox2Error> BlockingReceive()

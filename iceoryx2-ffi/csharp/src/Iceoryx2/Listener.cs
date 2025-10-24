@@ -11,6 +11,8 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Iceoryx2.SafeHandles;
 
 namespace Iceoryx2;
@@ -104,7 +106,49 @@ public sealed class Listener : IDisposable
     }
 
     /// <summary>
+    /// Asynchronously waits for an event with a timeout.
+    /// This method offloads the blocking native call to a background thread.
+    /// </summary>
+    /// <param name="timeout">The maximum time to wait for an event.</param>
+    /// <param name="cancellationToken">Optional cancellation token to cancel the wait operation.</param>
+    /// <returns>
+    /// On success, returns the EventId if one was received, or null if the timeout elapsed.
+    /// On error, returns an error code.
+    /// </returns>
+    public Task<Result<EventId?, Iox2Error>> WaitAsync(TimeSpan timeout, CancellationToken cancellationToken = default)
+    {
+        ThrowIfDisposed();
+        
+        return Task.Run(() =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return TimedWait(timeout);
+        }, cancellationToken);
+    }
+
+    /// <summary>
+    /// Asynchronously waits for an event indefinitely.
+    /// This method offloads the blocking native call to a background thread.
+    /// </summary>
+    /// <param name="cancellationToken">Optional cancellation token to cancel the wait operation.</param>
+    /// <returns>
+    /// On success, returns the received EventId.
+    /// On error, returns an error code.
+    /// </returns>
+    public Task<Result<EventId, Iox2Error>> WaitAsync(CancellationToken cancellationToken = default)
+    {
+        ThrowIfDisposed();
+        
+        return Task.Run(() =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return BlockingWait();
+        }, cancellationToken);
+    }
+
+    /// <summary>
     /// Blocks until an event is received.
+    /// Consider using WaitAsync() for better thread pool utilization.
     /// </summary>
     /// <returns>
     /// On success, returns the received EventId.

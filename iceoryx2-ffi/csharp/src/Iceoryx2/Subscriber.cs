@@ -1,4 +1,6 @@
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Iceoryx2.SafeHandles;
 
 namespace Iceoryx2;
@@ -57,6 +59,73 @@ public sealed class Subscriber : IDisposable
         catch (Exception)
         {
             return Result<Sample<T>?, Iox2Error>.Err(Iox2Error.ReceiveFailed);
+        }
+    }
+
+    /// <summary>
+    /// Asynchronously waits for a sample with a timeout by polling.
+    /// </summary>
+    /// <param name="timeout">The maximum time to wait for a sample.</param>
+    /// <param name="cancellationToken">Optional cancellation token to cancel the wait operation.</param>
+    /// <returns>A Task containing a Result with the sample if received within timeout (null if timeout), or an error.</returns>
+    public async Task<Result<Sample<T>?, Iox2Error>> ReceiveAsync<T>(TimeSpan timeout, CancellationToken cancellationToken = default) where T : unmanaged
+    {
+        ThrowIfDisposed();
+
+        var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+        
+        while (stopwatch.Elapsed < timeout)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var result = Receive<T>();
+            if (!result.IsOk)
+            {
+                return result;
+            }
+
+            var sample = result.Unwrap();
+            if (sample != null)
+            {
+                return Result<Sample<T>?, Iox2Error>.Ok(sample);
+            }
+
+            // Yield to thread pool instead of blocking
+            await Task.Delay(10, cancellationToken).ConfigureAwait(false);
+        }
+
+        return Result<Sample<T>?, Iox2Error>.Ok(null);
+    }
+
+    /// <summary>
+    /// Asynchronously waits for a sample indefinitely by polling.
+    /// Note: This polls every 10ms since the native API doesn't have a blocking receive.
+    /// The polling is efficient as it yields to the thread pool between checks.
+    /// </summary>
+    /// <param name="cancellationToken">Optional cancellation token to cancel the wait operation.</param>
+    /// <returns>A Task containing a Result with the sample or an error.</returns>
+    public async Task<Result<Sample<T>, Iox2Error>> ReceiveAsync<T>(CancellationToken cancellationToken = default) where T : unmanaged
+    {
+        ThrowIfDisposed();
+
+        while (true)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var result = Receive<T>();
+            if (!result.IsOk)
+            {
+                return Result<Sample<T>, Iox2Error>.Err(Iox2Error.ReceiveFailed);
+            }
+
+            var sample = result.Unwrap();
+            if (sample != null)
+            {
+                return Result<Sample<T>, Iox2Error>.Ok(sample);
+            }
+
+            // Yield to thread pool instead of blocking
+            await Task.Delay(10, cancellationToken).ConfigureAwait(false);
         }
     }
 

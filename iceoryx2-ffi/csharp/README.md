@@ -14,6 +14,7 @@ C# / .NET bindings for iceoryx2 - Zero-Copy Lock-Free IPC
 - ✅ **Event API** - Complete notifier/listener implementation with blocking/timed waits
 - ✅ **Request-Response API** - Complete client/server RPC with verified FFI signatures
 - ✅ **Complex Data Types** - Full support for custom structs with sequential layout
+- ✅ **Async/Await Support** - Modern async methods for all blocking operations with CancellationToken
 - ✅ Tests passing on macOS
 - ✅ Working examples for all major APIs (Pub/Sub, Event, RPC)
 - ✅ Production-ready with proper memory management and error handling
@@ -33,6 +34,7 @@ This package provides C# and .NET bindings for iceoryx2, enabling zero-copy inte
 - 🎯 **Idiomatic C#** - Builder pattern, Result types, LINQ-friendly APIs
 - 🔧 **Cross-platform** - Works on Linux, macOS, and Windows
 - 📦 **Multiple patterns** - Publish-Subscribe, Event, and Request-Response communication
+- ⚡ **Async/Await** - Full async support with CancellationToken for modern C# applications
 
 ## Quick Start
 
@@ -629,6 +631,213 @@ sample.Payload = new TransmissionData
 sample.Send();
 ```
 
+## Async/Await Support
+
+The C# bindings provide full async/await support for all blocking operations, enabling modern asynchronous programming patterns with proper cancellation support.
+
+### Benefits
+
+- **Non-blocking** - Operations yield to the thread pool instead of blocking threads
+- **Composable** - Use `Task.WhenAll()`, `Task.WhenAny()` for concurrent operations
+- **Cancellable** - All async methods accept `CancellationToken` for cooperative cancellation
+- **Efficient** - Better thread pool utilization compared to polling with `Thread.Sleep()`
+
+### Async Methods
+
+All classes with blocking operations provide async equivalents:
+
+#### PendingResponse (Request-Response)
+
+```csharp
+// Synchronous methods (block the calling thread)
+Result<Response<T>?, Iox2Error> TryReceive()
+Result<Response<T>?, Iox2Error> TimedReceive(TimeSpan timeout)
+Result<Response<T>, Iox2Error> BlockingReceive()
+
+// Asynchronous methods (yield to thread pool)
+Task<Result<Response<T>?, Iox2Error>> ReceiveAsync(TimeSpan timeout, CancellationToken ct = default)
+Task<Result<Response<T>, Iox2Error>> ReceiveAsync(CancellationToken ct = default)
+```
+
+#### Listener (Events)
+
+```csharp
+// Synchronous methods (block the calling thread)
+Result<EventId?, Iox2Error> TryWait()
+Result<EventId?, Iox2Error> TimedWait(TimeSpan timeout)
+Result<EventId, Iox2Error> BlockingWait()
+
+// Asynchronous methods (offload to background thread)
+Task<Result<EventId?, Iox2Error>> WaitAsync(TimeSpan timeout, CancellationToken ct = default)
+Task<Result<EventId, Iox2Error>> WaitAsync(CancellationToken ct = default)
+```
+
+#### Subscriber (Publish-Subscribe)
+
+```csharp
+// Synchronous method (non-blocking poll)
+Result<Sample<T>?, Iox2Error> Receive<T>()
+
+// Asynchronous methods (poll with yielding to thread pool)
+Task<Result<Sample<T>?, Iox2Error>> ReceiveAsync<T>(TimeSpan timeout, CancellationToken ct = default)
+Task<Result<Sample<T>, Iox2Error>> ReceiveAsync<T>(CancellationToken ct = default)
+```
+
+**Note:** Subscriber async methods use polling (every 10ms) since the native API doesn't provide blocking receive. However, they yield to the thread pool efficiently.
+
+### Example: Async Request-Response Client
+
+```csharp
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Iceoryx2;
+using Iceoryx2.RequestResponse;
+
+public async Task RunClientAsync(CancellationToken cancellationToken = default)
+{
+    // Create node and service (same as sync version)
+    var node = NodeBuilder.New()
+        .Name("async_client")
+        .Create()
+        .Unwrap();
+    
+    using var service = node.ServiceBuilder()
+        .RequestResponse<ulong, MyResponse>()
+        .Open("MyService")
+        .Unwrap();
+    
+    using var client = service.CreateClient().Unwrap();
+    
+    // Send request
+    var sendResult = client.SendCopy(42ul);
+    using var pendingResponse = sendResult.Unwrap();
+    
+    // Wait for response asynchronously with timeout
+    var responseResult = await pendingResponse.ReceiveAsync(
+        TimeSpan.FromSeconds(2), 
+        cancellationToken);
+    
+    if (responseResult.IsOk)
+    {
+        var response = responseResult.Unwrap();
+        if (response != null)
+        {
+            using (response)
+            {
+                Console.WriteLine($"Received: {response.Payload}");
+            }
+        }
+        else
+        {
+            Console.WriteLine("Request timed out");
+        }
+    }
+}
+```
+
+### Example: Async Event Listener
+
+```csharp
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Iceoryx2;
+
+public async Task RunListenerAsync(CancellationToken cancellationToken = default)
+{
+    var node = NodeBuilder.New()
+        .Name("async_listener")
+        .Create()
+        .Unwrap();
+    
+    using var service = node.ServiceBuilder()
+        .Event()
+        .Open("MyEvents")
+        .Unwrap();
+    
+    using var listener = service.CreateListener().Unwrap();
+    
+    // Wait for events asynchronously
+    while (!cancellationToken.IsCancellationRequested)
+    {
+        var result = await listener.WaitAsync(
+            TimeSpan.FromSeconds(5), 
+            cancellationToken);
+        
+        if (result.IsOk)
+        {
+            var eventId = result.Unwrap();
+            if (eventId.HasValue)
+            {
+                Console.WriteLine($"Received event: {eventId.Value}");
+            }
+            else
+            {
+                Console.WriteLine("Timeout - no event");
+            }
+        }
+    }
+}
+```
+
+### Best Practices
+
+**1. Use async methods in async contexts:**
+```csharp
+// ✅ GOOD: Async all the way
+public async Task ProcessDataAsync()
+{
+    var response = await pendingResponse.ReceiveAsync(TimeSpan.FromSeconds(1));
+    // ... process response
+}
+
+// ❌ BAD: Blocking in async method
+public async Task ProcessDataAsync()
+{
+    var response = pendingResponse.TimedReceive(TimeSpan.FromSeconds(1)); // Blocks!
+}
+```
+
+**2. Always pass CancellationToken:**
+```csharp
+// ✅ GOOD: Cancellable operation
+public async Task WorkAsync(CancellationToken ct)
+{
+    var response = await pendingResponse.ReceiveAsync(TimeSpan.FromSeconds(10), ct);
+}
+
+// ⚠️ OK but less flexible: No cancellation
+public async Task WorkAsync()
+{
+    var response = await pendingResponse.ReceiveAsync(TimeSpan.FromSeconds(10));
+}
+```
+
+**3. Use ConfigureAwait(false) in libraries:**
+```csharp
+// In library code, avoid capturing SynchronizationContext
+var response = await pendingResponse
+    .ReceiveAsync(timeout, ct)
+    .ConfigureAwait(false);
+```
+
+**4. Combine with Task composition:**
+```csharp
+// Wait for multiple responses concurrently
+var tasks = new[]
+{
+    pending1.ReceiveAsync(timeout, ct),
+    pending2.ReceiveAsync(timeout, ct),
+    pending3.ReceiveAsync(timeout, ct)
+};
+
+var responses = await Task.WhenAll(tasks);
+
+// Or race for the first response
+var firstResponse = await Task.WhenAny(tasks);
+```
+
 ## Naming Convention
 
 The C# bindings follow .NET naming conventions:
@@ -802,6 +1011,31 @@ Demonstrates client-server RPC pattern with fully verified C API compatibility:
 - Demonstrates both `SendCopy()` convenience method and `Loan()`/`LoanResponse()` for zero-copy
 - FFI signatures verified to exactly match the C API for reliable operation
 
+### 5. AsyncPubSub
+**Location:** `examples/AsyncPubSub/`
+
+Demonstrates modern async/await patterns for publish-subscribe:
+- Async publisher using `await Task.Delay()` instead of blocking
+- Async subscriber with timeout using `ReceiveAsync()`
+- Async subscriber blocking until data arrives
+- Multiple concurrent subscribers processing data in parallel
+- Proper cancellation support with `CancellationToken`
+- Shows best practices for async IPC in modern C# applications
+
+**Run with:**
+```bash
+# Terminal 1 - Async publisher
+cd examples/AsyncPubSub
+dotnet run publisher
+
+# Terminal 2 - Async subscriber with timeout
+dotnet run subscriber
+
+# Or try other modes: blocking, multi
+dotnet run blocking
+dotnet run multi
+```
+
 ## Contributing
 
 Contributions are welcome! Here are some areas where you can help:
@@ -839,6 +1073,7 @@ Contributions are welcome! Here are some areas where you can help:
 - [x] Cross-platform library loading (macOS, Linux, Windows)
 - [x] Comprehensive examples for all major APIs
 - [x] Memory-safe resource management with SafeHandle pattern
+- [x] Full async/await support with CancellationToken
 - [ ] Pipeline API
 - [ ] Service discovery and monitoring
 - [ ] Performance benchmarks vs other IPC solutions

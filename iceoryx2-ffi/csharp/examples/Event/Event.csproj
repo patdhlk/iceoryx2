@@ -7,6 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../../Iceoryx2.csproj" />
+    <ProjectReference Include="../../src/Iceoryx2/Iceoryx2.csproj" />
   </ItemGroup>
 </Project>
