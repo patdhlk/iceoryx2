@@ -113,7 +113,7 @@ dotnet run
 iceoryx2-ffi/csharp/
 ├── src/
 │   └── Iceoryx2/
-│       ├── Native/          # Auto-generated P/Invoke bindings (ClangSharp)
+│       ├── Native/          # C-bindings via P/Invoke
 │       ├── Node.cs          # High-level C# wrapper for Node
 │       ├── Service.cs       # High-level C# wrapper for Service
 │       ├── Publisher.cs     # High-level C# wrapper for Publisher
