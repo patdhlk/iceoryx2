@@ -969,4 +969,35 @@ internal static partial class Iox2NativeMethods
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
     internal static extern IntPtr iox2_config_global_config();
+
+    // ========================================
+    // Additional Logging API
+    // ========================================
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    internal delegate void iox2_log_callback(iox2_log_level_e log_level, IntPtr origin, IntPtr message);
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern void iox2_log(iox2_log_level_e log_level, IntPtr origin, IntPtr message);
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    internal static extern bool iox2_use_console_logger();
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    internal static extern bool iox2_use_file_logger(IntPtr log_file);
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern void iox2_set_log_level_from_env_or_default();
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern void iox2_set_log_level(iox2_log_level_e level);
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern iox2_log_level_e iox2_get_log_level();
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    internal static extern bool iox2_set_logger(iox2_log_callback logger);
 }

@@ -6,6 +6,14 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
+  <!-- Copy native library from Iceoryx2 output directory -->
+  <Target Name="CopyNativeLibrary" AfterTargets="Build">
+    <ItemGroup>
+      <NativeLibs Include="../../src/Iceoryx2/bin/$(Configuration)/$(TargetFramework)/libiceoryx2_ffi_c.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(NativeLibs)" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" />
+  </Target>
+
   <ItemGroup>
     <ProjectReference Include="../../src/Iceoryx2/Iceoryx2.csproj" />
   </ItemGroup>

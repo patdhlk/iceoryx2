@@ -3,10 +3,13 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
-    <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/Iceoryx2/Iceoryx2.csproj" />
+  </ItemGroup>
 
   <!-- Copy native library from Iceoryx2 output directory -->
   <Target Name="CopyNativeLibrary" AfterTargets="Build">
@@ -15,9 +18,5 @@
     </ItemGroup>
     <Copy SourceFiles="@(NativeLibs)" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" />
   </Target>
-
-  <ItemGroup>
-    <ProjectReference Include="../../src/Iceoryx2/Iceoryx2.csproj" />
-  </ItemGroup>
 
 </Project>
