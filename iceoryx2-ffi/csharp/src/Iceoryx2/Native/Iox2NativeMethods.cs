@@ -861,7 +861,8 @@ internal static partial class Iox2NativeMethods
     internal static extern int iox2_client_send_copy(
         ref IntPtr client_handle,
         IntPtr data_ptr,
-        UIntPtr data_len,
+        UIntPtr size_of_element,
+        UIntPtr number_of_elements,
         IntPtr pending_response_struct_ptr,
         out IntPtr pending_response_handle);
 
@@ -885,34 +886,35 @@ internal static partial class Iox2NativeMethods
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
     internal static extern int iox2_server_receive(
         ref IntPtr server_handle,
-        IntPtr request_struct_ptr,
-        out IntPtr request_handle);
+        IntPtr active_request_struct_ptr,
+        out IntPtr active_request_handle);
+
+    // ========================================
+    // ActiveRequest API (server-side request)
+    // ========================================
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern int iox2_request_loan_response_slice_uninit(
-        ref IntPtr request_handle,
+    internal static extern void iox2_active_request_drop(IntPtr active_request_handle);
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern void iox2_active_request_payload(
+        ref IntPtr active_request_handle,
+        out IntPtr payload_ptr,
+        out UIntPtr payload_len);
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern int iox2_active_request_loan_slice_uninit(
+        ref IntPtr active_request_handle,
         IntPtr response_struct_ptr,
         out IntPtr response_handle,
         UIntPtr number_of_elements);
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern int iox2_request_send_copy_response(
-        ref IntPtr request_handle,
+    internal static extern int iox2_active_request_send_copy(
+        ref IntPtr active_request_handle,
         IntPtr data_ptr,
-        UIntPtr data_len);
-
-    // ========================================
-    // Request API
-    // ========================================
-
-    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern void iox2_request_drop(IntPtr request_handle);
-
-    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern void iox2_request_payload(
-        ref IntPtr request_handle,
-        out IntPtr payload_ptr,
-        out UIntPtr payload_len);
+        UIntPtr data_len,
+        UIntPtr number_of_elements);
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
     internal static extern void iox2_request_mut_payload_mut(
@@ -956,21 +958,7 @@ internal static partial class Iox2NativeMethods
     internal static extern void iox2_pending_response_drop(IntPtr pending_response_handle);
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern int iox2_pending_response_try_receive(
-        ref IntPtr pending_response_handle,
-        IntPtr response_struct_ptr,
-        out IntPtr response_handle);
-
-    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern int iox2_pending_response_timed_receive(
-        ref IntPtr pending_response_handle,
-        IntPtr response_struct_ptr,
-        out IntPtr response_handle,
-        ulong seconds,
-        uint nanoseconds);
-
-    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern int iox2_pending_response_blocking_receive(
+    internal static extern int iox2_pending_response_receive(
         ref IntPtr pending_response_handle,
         IntPtr response_struct_ptr,
         out IntPtr response_handle);

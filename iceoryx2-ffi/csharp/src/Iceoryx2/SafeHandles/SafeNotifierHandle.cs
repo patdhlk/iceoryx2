@@ -12,18 +12,18 @@
 
 using System;
 
-namespace Iceoryx2;
+namespace Iceoryx2.SafeHandles;
 
 /// <summary>
-/// Safe handle for Event Service resources (Port Factory Event).
+/// Safe handle for Notifier resources.
 /// </summary>
-internal sealed class SafeEventServiceHandle : SafeIox2Handle
+internal sealed class SafeNotifierHandle : SafeIox2Handle
 {
-    public SafeEventServiceHandle() : base()
+    public SafeNotifierHandle() : base()
     {
     }
 
-    public SafeEventServiceHandle(IntPtr handle) : base(handle)
+    public SafeNotifierHandle(IntPtr handle) : base(handle)
     {
     }
 
@@ -31,7 +31,7 @@ internal sealed class SafeEventServiceHandle : SafeIox2Handle
     {
         if (!IsInvalid && handle != IntPtr.Zero)
         {
-            Native.Iox2NativeMethods.iox2_port_factory_event_drop(handle);
+            Native.Iox2NativeMethods.iox2_notifier_drop(handle);
             return true;
         }
         return false;

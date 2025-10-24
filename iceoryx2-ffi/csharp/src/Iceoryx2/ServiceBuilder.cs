@@ -31,6 +31,16 @@ public sealed class ServiceBuilder
     }
 
     /// <summary>
+    /// Creates a request-response service builder.
+    /// </summary>
+    public RequestResponse.RequestResponseServiceBuilder<TRequest, TResponse> RequestResponse<TRequest, TResponse>()
+        where TRequest : unmanaged
+        where TResponse : unmanaged
+    {
+        return new RequestResponse.RequestResponseServiceBuilder<TRequest, TResponse>(_node);
+    }
+
+    /// <summary>
     /// Gets a Rust-compatible type name for cross-language interoperability.
     /// Maps .NET types to their Rust equivalents for iceoryx2 type matching.
     /// </summary>

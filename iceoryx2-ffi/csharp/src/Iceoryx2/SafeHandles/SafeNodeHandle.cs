@@ -1,6 +1,6 @@
 using System;
 
-namespace Iceoryx2;
+namespace Iceoryx2.SafeHandles;
 
 /// <summary>
 /// Safe handle for Node resources.

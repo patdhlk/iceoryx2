@@ -11,29 +11,23 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
 using System;
+using System.Runtime.InteropServices;
+using Microsoft.Win32.SafeHandles;
 
-namespace Iceoryx2;
+namespace Iceoryx2.SafeHandles;
 
 /// <summary>
-/// Safe handle for Listener resources.
+/// Safe handle for native iceoryx2 resources.
+/// Ensures proper cleanup of native resources even if Dispose is not called.
 /// </summary>
-internal sealed class SafeListenerHandle : SafeIox2Handle
+internal abstract class SafeIox2Handle : SafeHandleZeroOrMinusOneIsInvalid
 {
-    public SafeListenerHandle() : base()
+    protected SafeIox2Handle() : base(true)
     {
     }
 
-    public SafeListenerHandle(IntPtr handle) : base(handle)
+    protected SafeIox2Handle(IntPtr handle) : base(true)
     {
-    }
-
-    protected override bool ReleaseHandle()
-    {
-        if (!IsInvalid && handle != IntPtr.Zero)
-        {
-            Native.Iox2NativeMethods.iox2_listener_drop(handle);
-            return true;
-        }
-        return false;
+        SetHandle(handle);
     }
 }

@@ -11,23 +11,29 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
 using System;
-using System.Runtime.InteropServices;
-using Microsoft.Win32.SafeHandles;
 
-namespace Iceoryx2;
+namespace Iceoryx2.SafeHandles;
 
 /// <summary>
-/// Safe handle for native iceoryx2 resources.
-/// Ensures proper cleanup of native resources even if Dispose is not called.
+/// Safe handle for Event Service resources (Port Factory Event).
 /// </summary>
-internal abstract class SafeIox2Handle : SafeHandleZeroOrMinusOneIsInvalid
+internal sealed class SafeEventServiceHandle : SafeIox2Handle
 {
-    protected SafeIox2Handle() : base(true)
+    public SafeEventServiceHandle() : base()
     {
     }
 
-    protected SafeIox2Handle(IntPtr handle) : base(true)
+    public SafeEventServiceHandle(IntPtr handle) : base(handle)
     {
-        SetHandle(handle);
+    }
+
+    protected override bool ReleaseHandle()
+    {
+        if (!IsInvalid && handle != IntPtr.Zero)
+        {
+            Native.Iox2NativeMethods.iox2_port_factory_event_drop(handle);
+            return true;
+        }
+        return false;
     }
 }

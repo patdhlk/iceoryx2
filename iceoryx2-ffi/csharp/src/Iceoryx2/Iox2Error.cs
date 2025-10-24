@@ -91,6 +91,62 @@ public enum Iox2Error
     EventServiceCreationFailed,
 
     /// <summary>
+    /// Indicates a failure during the creation of a request-response service.
+    /// This error is encountered when the necessary resources or configurations
+    /// required to establish the request-response service cannot be fulfilled.
+    /// </summary>
+    RequestResponseServiceCreationFailed,
+
+    /// <summary>
+    /// Indicates a failure during the creation of a client.
+    /// This error may occur when the system cannot allocate the required resources
+    /// or establish the client for request-response communication.
+    /// </summary>
+    ClientCreationFailed,
+
+    /// <summary>
+    /// Indicates a failure during the creation of a server.
+    /// This error may occur when the system cannot allocate the required resources
+    /// or establish the server for request-response communication.
+    /// </summary>
+    ServerCreationFailed,
+
+    /// <summary>
+    /// Represents an error condition where loaning a request failed.
+    /// This error may occur if the client cannot allocate memory for the request
+    /// due to resource constraints or invalid state.
+    /// </summary>
+    RequestLoanFailed,
+
+    /// <summary>
+    /// Represents an error condition where sending a request failed.
+    /// This error may occur if the request cannot be transmitted to the server
+    /// due to communication breakdown or resource issues.
+    /// </summary>
+    RequestSendFailed,
+
+    /// <summary>
+    /// Represents an error condition where loaning a response failed.
+    /// This error may occur if the server cannot allocate memory for the response
+    /// due to resource constraints or invalid state.
+    /// </summary>
+    ResponseLoanFailed,
+
+    /// <summary>
+    /// Represents an error condition where sending a response failed.
+    /// This error may occur if the response cannot be transmitted back to the client
+    /// due to communication breakdown or resource issues.
+    /// </summary>
+    ResponseSendFailed,
+
+    /// <summary>
+    /// Represents an error condition where receiving a response failed.
+    /// This error may occur if the client cannot successfully retrieve the response
+    /// from the server due to timeout or communication issues.
+    /// </summary>
+    ResponseReceiveFailed,
+
+    /// <summary>
     /// Indicates that an operation failed due to an invalid handle being used.
     /// This error typically occurs when a handle provided to the system is
     /// unrecognized, uninitialized, or no longer valid.

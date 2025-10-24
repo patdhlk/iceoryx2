@@ -12,18 +12,18 @@
 
 using System;
 
-namespace Iceoryx2;
+namespace Iceoryx2.SafeHandles;
 
 /// <summary>
-/// Safe handle for Notifier resources.
+/// Safe handle for Listener resources.
 /// </summary>
-internal sealed class SafeNotifierHandle : SafeIox2Handle
+internal sealed class SafeListenerHandle : SafeIox2Handle
 {
-    public SafeNotifierHandle() : base()
+    public SafeListenerHandle() : base()
     {
     }
 
-    public SafeNotifierHandle(IntPtr handle) : base(handle)
+    public SafeListenerHandle(IntPtr handle) : base(handle)
     {
     }
 
@@ -31,7 +31,7 @@ internal sealed class SafeNotifierHandle : SafeIox2Handle
     {
         if (!IsInvalid && handle != IntPtr.Zero)
         {
-            Native.Iox2NativeMethods.iox2_notifier_drop(handle);
+            Native.Iox2NativeMethods.iox2_listener_drop(handle);
             return true;
         }
         return false;

@@ -10,10 +10,13 @@ C# / .NET bindings for iceoryx2 - Zero-Copy Lock-Free IPC
 - ✅ Complete P/Invoke FFI layer for all core APIs
 - ✅ Memory-safe resource management with SafeHandle pattern
 - ✅ High-level C# wrappers with builder pattern
-- ✅ **Publish-Subscribe API** - Full implementation with type safety
-- ✅ **Event API** - Complete notifier/listener implementation
+- ✅ **Publish-Subscribe API** - Full implementation with type safety and zero-copy
+- ✅ **Event API** - Complete notifier/listener implementation with blocking/timed waits
+- ✅ **Request-Response API** - Complete client/server RPC with verified FFI signatures
+- ✅ **Complex Data Types** - Full support for custom structs with sequential layout
 - ✅ Tests passing on macOS
-- ✅ Working examples for all major APIs
+- ✅ Working examples for all major APIs (Pub/Sub, Event, RPC)
+- ✅ Production-ready with proper memory management and error handling
 - ⚠️ Requires native library: `libiceoryx2_ffi_c.{so|dylib|dll}`
 
 📊 See [STATUS_REPORT.md](STATUS_REPORT.md) for detailed status.
@@ -29,7 +32,7 @@ This package provides C# and .NET bindings for iceoryx2, enabling zero-copy inte
 - 🧹 **Memory-safe** - Automatic resource management via SafeHandle and IDisposable
 - 🎯 **Idiomatic C#** - Builder pattern, Result types, LINQ-friendly APIs
 - 🔧 **Cross-platform** - Works on Linux, macOS, and Windows
-- 📦 **Multiple patterns** - Publish-Subscribe and Event communication
+- 📦 **Multiple patterns** - Publish-Subscribe, Event, and Request-Response communication
 
 ## Quick Start
 
@@ -162,6 +165,18 @@ cd examples/Event
 dotnet run -- listener
 ```
 
+**Request-Response Example:**
+
+```bash
+# Terminal 1 - Run server
+cd examples/RequestResponse
+dotnet run -- server
+
+# Terminal 2 - Run client
+cd examples/RequestResponse
+dotnet run -- client
+```
+
 **Complex Data Types Example:**
 
 ```bash
@@ -207,6 +222,16 @@ iceoryx2-ffi/csharp/
 │       │   ├── Listener.cs             # Event listener (receiver)
 │       │   ├── EventId.cs              # Event identifier type
 │       │   └── EventServiceBuilder.cs  # Event service builder
+│       ├── RequestResponse/             # Request-Response (RPC) pattern
+│       │   ├── RequestResponseService.cs       # RPC service wrapper
+│       │   ├── RequestResponseServiceBuilder.cs # RPC service builder
+│       │   ├── Client.cs               # RPC client (request sender)
+│       │   ├── Server.cs               # RPC server (request receiver)
+│       │   ├── Request.cs              # Received request
+│       │   ├── RequestMut.cs           # Mutable request to send
+│       │   ├── Response.cs             # Received response
+│       │   ├── ResponseMut.cs          # Mutable response to send
+│       │   └── PendingResponse.cs      # Async response handle
 │       ├── Types/                       # Common types and utilities
 │       │   ├── Result.cs               # Result<T, E> monad
 │       │   ├── Iox2Error.cs            # Error enumeration
@@ -215,7 +240,8 @@ iceoryx2-ffi/csharp/
 ├── examples/                            # C# examples
 │   ├── PublishSubscribe/               # Pub/Sub example
 │   ├── ComplexDataTypes/               # Complex struct example
-│   └── Event/                          # Event API example
+│   ├── Event/                          # Event API example
+│   └── RequestResponse/                # Request-Response RPC example
 ├── tests/                               # Unit tests
 │   └── Iceoryx2Tests/
 │       ├── BasicTests.cs               # Core functionality tests
@@ -408,6 +434,165 @@ var blockingEventId = blockingWaitResult.Unwrap();
 Console.WriteLine($"Received event: {blockingEventId}");
 ```
 
+### Request-Response Pattern (RPC)
+
+The Request-Response API provides a complete client-server RPC implementation with support for both convenience methods and zero-copy operations.
+
+```csharp
+using Iceoryx2;
+using Iceoryx2.RequestResponse;
+using System.Runtime.InteropServices;
+
+// Define request and response types
+[StructLayout(LayoutKind.Sequential)]
+public struct AddRequest
+{
+    public int Value;
+}
+
+[StructLayout(LayoutKind.Sequential)]
+public struct AddResponse
+{
+    public int Sum;
+}
+
+// Create a node
+var nodeResult = NodeBuilder.New()
+    .Name("rpc_node")
+    .Create();
+
+if (!nodeResult.IsOk)
+{
+    Console.WriteLine($"Failed to create node: {nodeResult}");
+    return;
+}
+
+using var node = nodeResult.Unwrap();
+
+// Open or create a request-response service
+var serviceResult = node.ServiceBuilder()
+    .RequestResponse<AddRequest, AddResponse>()
+    .Open("AddService");
+
+if (!serviceResult.IsOk)
+{
+    Console.WriteLine($"Failed to open service: {serviceResult}");
+    return;
+}
+
+using var service = serviceResult.Unwrap();
+
+// Client example - send request and wait for response
+var clientResult = service.CreateClient();
+if (!clientResult.IsOk)
+{
+    Console.WriteLine($"Failed to create client: {clientResult}");
+    return;
+}
+
+using var client = clientResult.Unwrap();
+
+// Option 1: SendCopy() - Convenience method that copies data
+var pendingResult = client.SendCopy(new AddRequest { Value = 42 });
+if (!pendingResult.IsOk)
+{
+    Console.WriteLine($"Failed to send request: {pendingResult}");
+    return;
+}
+
+using var pending = pendingResult.Unwrap();
+
+// Wait for response with timeout (non-blocking, timed, or blocking)
+var responseResult = pending.TimedReceive(TimeSpan.FromSeconds(2));
+if (!responseResult.IsOk)
+{
+    Console.WriteLine($"Failed to receive response: {responseResult}");
+    return;
+}
+
+var response = responseResult.Unwrap();
+if (response != null)
+{
+    using (response)
+    {
+        Console.WriteLine($"Response sum: {response.Payload.Sum}");
+    }
+}
+else
+{
+    Console.WriteLine("Request timed out");
+}
+
+// Option 2: Loan() - Zero-copy method for better performance
+var loanResult = client.Loan();
+if (loanResult.IsOk)
+{
+    using var request = loanResult.Unwrap();
+    request.Payload = new AddRequest { Value = 42 };
+    
+    var sendResult = request.Send();
+    if (sendResult.IsOk)
+    {
+        using var pendingResponse = sendResult.Unwrap();
+        // Handle response...
+    }
+}
+
+// Server example - receive request and send response
+var serverResult = service.CreateServer();
+if (!serverResult.IsOk)
+{
+    Console.WriteLine($"Failed to create server: {serverResult}");
+    return;
+}
+
+using var server = serverResult.Unwrap();
+
+while (true)
+{
+    var requestResult = server.Receive();
+    if (!requestResult.IsOk)
+    {
+        Console.WriteLine($"Failed to receive request: {requestResult}");
+        break;
+    }
+
+    var request = requestResult.Unwrap();
+    if (request != null)
+    {
+        using (request)
+        {
+            int value = request.Payload.Value;
+            
+            // Option 1: SendCopyResponse() - Convenience method
+            var sendResult = request.SendCopyResponse(new AddResponse { Sum = value + 100 });
+            if (!sendResult.IsOk)
+            {
+                Console.WriteLine($"Failed to send response: {sendResult}");
+            }
+            
+            // Option 2: LoanResponse() - Zero-copy method
+            // var loanResult = request.LoanResponse();
+            // if (loanResult.IsOk)
+            // {
+            //     using var response = loanResult.Unwrap();
+            //     response.Payload = new AddResponse { Sum = value + 100 };
+            //     response.Send();
+            // }
+        }
+    }
+    
+    Thread.Sleep(100); // Small delay between checks
+}
+```
+
+**Key Features:**
+- ✅ Fully verified FFI signatures matching the C API exactly
+- ✅ Both convenience methods (`SendCopy`, `SendCopyResponse`) and zero-copy methods (`Loan`, `LoanResponse`)
+- ✅ Three response waiting modes: non-blocking (`TryReceive`), timed (`TimedReceive`), and blocking (`BlockingReceive`)
+- ✅ Proper memory management with automatic cleanup
+- ✅ Type-safe request/response handling with generic types
+
 ### Complex Data Types
 
 The bindings support complex data types using sequential layout:
@@ -533,7 +718,7 @@ var node = NodeBuilder.New().Create().Unwrap();
 
 - ✅ **Publish-Subscribe** - One-to-many data distribution with zero-copy
 - ✅ **Event** - Lightweight notification system with custom event IDs
-- 🚧 **Request-Response** - Coming soon
+- ✅ **Request-Response** - Client-server RPC with async response handling
 - 🚧 **Pipeline** - Coming soon
 
 ### Supported Platforms
@@ -607,6 +792,16 @@ Demonstrates zero-copy sharing of complex structs:
 - Shows struct layout and type naming
 - Demonstrates cross-process struct sharing
 
+### 4. RequestResponse
+**Location:** `examples/RequestResponse/`
+
+Demonstrates client-server RPC pattern with fully verified C API compatibility:
+- Client sends `AddRequest` messages with integer values
+- Server maintains a running sum and responds with `AddResponse`
+- Shows async response handling with three wait modes (non-blocking, timed, blocking)
+- Demonstrates both `SendCopy()` convenience method and `Loan()`/`LoanResponse()` for zero-copy
+- FFI signatures verified to exactly match the C API for reliable operation
+
 ## Contributing
 
 Contributions are welcome! Here are some areas where you can help:
@@ -637,15 +832,19 @@ Contributions are welcome! Here are some areas where you can help:
 ## Roadmap
 
 - [x] Core infrastructure (Node, Service, Builder patterns)
-- [x] Publish-Subscribe API
-- [x] Event API  
-- [x] Complex data type support
-- [x] Cross-platform library loading
-- [ ] Request-Response API
+- [x] Publish-Subscribe API with zero-copy support
+- [x] Event API with blocking/timed/non-blocking waits
+- [x] Request-Response API (RPC) with verified FFI compatibility
+- [x] Complex data type support with sequential layout
+- [x] Cross-platform library loading (macOS, Linux, Windows)
+- [x] Comprehensive examples for all major APIs
+- [x] Memory-safe resource management with SafeHandle pattern
 - [ ] Pipeline API
 - [ ] Service discovery and monitoring
-- [ ] Performance benchmarks
+- [ ] Performance benchmarks vs other IPC solutions
 - [ ] NuGet package publication
+- [ ] XML documentation improvements
+- [ ] Additional integration tests
 
 ## License
 

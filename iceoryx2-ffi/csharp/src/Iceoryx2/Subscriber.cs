@@ -1,4 +1,5 @@
 using System;
+using Iceoryx2.SafeHandles;
 
 namespace Iceoryx2;
 
