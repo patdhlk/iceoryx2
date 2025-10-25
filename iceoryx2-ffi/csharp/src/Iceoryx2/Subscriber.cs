@@ -30,7 +30,7 @@ public sealed class Subscriber : IDisposable
             // Receive sample - pass by reference for subscriber handle
             var subscriberHandle = _handle.DangerousGetHandle();
             
-            // Debug: Log the handle value
+            // Debug: Iox2Log the handle value
             Console.WriteLine($"[DEBUG] Calling receive with handle: {subscriberHandle}");
             
             var result = Native.Iox2NativeMethods.iox2_subscriber_receive(

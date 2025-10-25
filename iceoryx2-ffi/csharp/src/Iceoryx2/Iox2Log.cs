@@ -23,28 +23,28 @@ namespace Iceoryx2;
 /// <example>
 /// <code>
 /// // Set log level from environment variable IOX2_LOG_LEVEL, default to Info
-/// Log.SetLogLevelFromEnvOrDefault();
+/// Iox2Log.SetLogLevelFromEnvOrDefault();
 /// 
 /// // Or set specific log level
-/// Log.SetLogLevel(LogLevel.Debug);
+/// Iox2Log.SetLogLevel(LogLevel.Debug);
 /// 
 /// // Use console logger
-/// Log.UseConsoleLogger();
+/// Iox2Log.UseConsoleLogger();
 /// 
 /// // Or use file logger
-/// Log.UseFileLogger("/tmp/iceoryx2.log");
+/// Iox2Log.UseFileLogger("/tmp/iceoryx2.log");
 /// 
 /// // Manual logging
-/// Log.Write(LogLevel.Info, "MyApp", "Application started");
+/// Iox2Log.Write(LogLevel.Info, "MyApp", "Application started");
 /// 
 /// // Custom logger
-/// Log.SetLogger((level, origin, message) =>
+/// Iox2Log.SetLogger((level, origin, message) =>
 /// {
 ///     Console.WriteLine($"[{level}] {origin}: {message}");
 /// });
 /// </code>
 /// </example>
-public static class Log
+public static class Iox2Log
 {
     /// <summary>
     /// Delegate for custom log callbacks.

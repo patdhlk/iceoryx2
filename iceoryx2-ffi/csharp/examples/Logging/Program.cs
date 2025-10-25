@@ -34,23 +34,23 @@ class Program
         Console.WriteLine();
 
         // Set log level from environment variable IOX2_LOG_LEVEL (or default to Info)
-        Log.SetLogLevelFromEnvOrDefault();
+        Iox2Log.SetLogLevelFromEnvOrDefault();
         
         // Use the built-in console logger
-        if (Log.UseConsoleLogger())
+        if (Iox2Log.UseConsoleLogger())
         {
             Console.WriteLine("Console logger initialized successfully");
         }
         
-        Console.WriteLine($"Current log level: {Log.GetLogLevel()}");
+        Console.WriteLine($"Current log level: {Iox2Log.GetLogLevel()}");
         Console.WriteLine();
 
-        // Log messages at different levels
-        Log.Write(LogLevel.Trace, "ExampleApp", "This is a TRACE message (usually not visible)");
-        Log.Write(LogLevel.Debug, "ExampleApp", "This is a DEBUG message");
-        Log.Write(LogLevel.Info, "ExampleApp", "This is an INFO message");
-        Log.Write(LogLevel.Warn, "ExampleApp", "This is a WARN message");
-        Log.Write(LogLevel.Error, "ExampleApp", "This is an ERROR message");
+        // Iox2Log messages at different levels
+        Iox2Log.Write(LogLevel.Trace, "ExampleApp", "This is a TRACE message (usually not visible)");
+        Iox2Log.Write(LogLevel.Debug, "ExampleApp", "This is a DEBUG message");
+        Iox2Log.Write(LogLevel.Info, "ExampleApp", "This is an INFO message");
+        Iox2Log.Write(LogLevel.Warn, "ExampleApp", "This is a WARN message");
+        Iox2Log.Write(LogLevel.Error, "ExampleApp", "This is an ERROR message");
         
         Console.WriteLine();
         Console.WriteLine("Try setting IOX2_LOG_LEVEL environment variable:");
@@ -75,7 +75,7 @@ class Program
         Console.WriteLine();
 
         // Set custom logger callback
-        bool success = Log.SetLogger((level, origin, message) =>
+        bool success = Iox2Log.SetLogger((level, origin, message) =>
         {
             var timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
             var levelStr = level.ToString().ToUpper().PadRight(5);
@@ -115,15 +115,15 @@ class Program
         Console.WriteLine();
 
         // Set log level to see all messages
-        Log.SetLogLevel(LogLevel.Trace);
+        Iox2Log.SetLogLevel(LogLevel.Trace);
 
-        // Log messages at different levels
-        Log.Write(LogLevel.Trace, "CustomApp", "Trace: Very detailed debugging information");
-        Log.Write(LogLevel.Debug, "CustomApp", "Debug: Debugging information");
-        Log.Write(LogLevel.Info, "CustomApp", "Info: General information");
-        Log.Write(LogLevel.Warn, "CustomApp", "Warn: Warning message");
-        Log.Write(LogLevel.Error, "CustomApp", "Error: Something went wrong");
-        Log.Write(LogLevel.Fatal, "CustomApp", "Fatal: Critical error!");
+        // Iox2Log messages at different levels
+        Iox2Log.Write(LogLevel.Trace, "CustomApp", "Trace: Very detailed debugging information");
+        Iox2Log.Write(LogLevel.Debug, "CustomApp", "Debug: Debugging information");
+        Iox2Log.Write(LogLevel.Info, "CustomApp", "Info: General information");
+        Iox2Log.Write(LogLevel.Warn, "CustomApp", "Warn: Warning message");
+        Iox2Log.Write(LogLevel.Error, "CustomApp", "Error: Something went wrong");
+        Iox2Log.Write(LogLevel.Fatal, "CustomApp", "Fatal: Critical error!");
         
         Console.WriteLine();
         
@@ -145,7 +145,7 @@ class Program
         var logFile = "/tmp/iceoryx2_csharp.log";
         
         // Use file logger
-        if (Log.UseFileLogger(logFile))
+        if (Iox2Log.UseFileLogger(logFile))
         {
             Console.WriteLine($"File logger initialized: {logFile}");
         }
@@ -156,16 +156,16 @@ class Program
         }
 
         // Set log level
-        Log.SetLogLevel(LogLevel.Debug);
-        Console.WriteLine($"Log level set to: {Log.GetLogLevel()}");
+        Iox2Log.SetLogLevel(LogLevel.Debug);
+        Console.WriteLine($"Iox2Log level set to: {Iox2Log.GetLogLevel()}");
         Console.WriteLine();
 
         // Write some log messages
         Console.WriteLine("Writing log messages to file...");
-        Log.Write(LogLevel.Debug, "FileLogging", "Debug message to file");
-        Log.Write(LogLevel.Info, "FileLogging", "Info message to file");
-        Log.Write(LogLevel.Warn, "FileLogging", "Warning message to file");
-        Log.Write(LogLevel.Error, "FileLogging", "Error message to file");
+        Iox2Log.Write(LogLevel.Debug, "FileLogging", "Debug message to file");
+        Iox2Log.Write(LogLevel.Info, "FileLogging", "Info message to file");
+        Iox2Log.Write(LogLevel.Warn, "FileLogging", "Warning message to file");
+        Iox2Log.Write(LogLevel.Error, "FileLogging", "Error message to file");
         
         // Create a node to generate library logs
         Console.WriteLine("Creating iceoryx2 node (logs will be written to file)...");
