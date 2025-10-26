@@ -12,7 +12,6 @@
 
 using Iceoryx2.SafeHandles;
 using System;
-using System.Runtime.InteropServices;
 
 namespace Iceoryx2;
 

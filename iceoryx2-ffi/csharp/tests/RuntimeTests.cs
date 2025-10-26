@@ -1,4 +1,3 @@
-using Iceoryx2;
 using Iceoryx2.Native;
 using System;
 using Xunit;

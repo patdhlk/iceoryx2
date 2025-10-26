@@ -11,7 +11,6 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
 using System;
-using System.Runtime.InteropServices;
 using static Iceoryx2.Native.Iox2NativeMethods;
 
 namespace Iceoryx2.RequestResponse;
