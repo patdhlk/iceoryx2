@@ -42,9 +42,9 @@ public sealed class Request<TRequest, TResponse> : IDisposable
         get
         {
             ThrowIfDisposed();
-            
+
             iox2_active_request_payload(ref _handle, out var payloadPtr, out var payloadLen);
-            
+
             if (payloadPtr == IntPtr.Zero)
             {
                 throw new InvalidOperationException("Failed to get request payload");

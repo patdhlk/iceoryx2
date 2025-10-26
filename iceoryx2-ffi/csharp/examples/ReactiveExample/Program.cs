@@ -24,7 +24,7 @@ public struct SensorData
     public double Humidity;
     public ulong Timestamp;
 
-    public override string ToString() => 
+    public override string ToString() =>
         $"Temp: {Temperature:F1}°C, Humidity: {Humidity:F1}%, Time: {Timestamp}";
 }
 
@@ -73,7 +73,7 @@ class Program
         Console.WriteLine("Press Ctrl+C to stop\n");
 
         var node = NodeBuilder.New().Create().Expect("Failed to create node");
-        
+
         var service = node.ServiceBuilder()
             .PublishSubscribe<SensorData>()
             .Open(serviceName)
@@ -128,7 +128,7 @@ class Program
         Console.WriteLine("Demonstrating various Rx operators:\n");
 
         var node = NodeBuilder.New().Create().Expect("Failed to create node");
-        
+
         var service = node.ServiceBuilder()
             .PublishSubscribe<SensorData>()
             .Open(serviceName)
@@ -164,7 +164,7 @@ class Program
 
         using var subscription2 = subscriber.AsObservable<SensorData>(cancellationToken: cts.Token)
             .Where(data => data.Temperature > 28.0)
-            .Subscribe(data => 
+            .Subscribe(data =>
                 Console.WriteLine($"[HOT!] {data.Temperature:F1}°C at timestamp {data.Timestamp}"));
 
         await Task.Delay(3000, cts.Token);
@@ -176,13 +176,13 @@ class Program
         subscription2.Dispose();
 
         using var subscription3 = subscriber.AsObservable<SensorData>(cancellationToken: cts.Token)
-            .Select(data => new 
-            { 
-                Temp = data.Temperature, 
+            .Select(data => new
+            {
+                Temp = data.Temperature,
                 IsCritical = data.Temperature > 30.0,
                 IsComfortable = data.Humidity > 40.0 && data.Humidity < 60.0
             })
-            .Subscribe(summary => 
+            .Subscribe(summary =>
                 Console.WriteLine($"[Summary] {summary.Temp:F1}°C, Critical: {summary.IsCritical}, Comfortable: {summary.IsComfortable}"));
 
         await Task.Delay(3000, cts.Token);
@@ -213,7 +213,7 @@ class Program
 
         using var subscription5 = subscriber.AsObservable<SensorData>(cancellationToken: cts.Token)
             .Sample(TimeSpan.FromSeconds(1))
-            .Subscribe(data => 
+            .Subscribe(data =>
                 Console.WriteLine($"[Sample] {data}"));
 
         await Task.Delay(5000, cts.Token);
@@ -227,7 +227,7 @@ class Program
         using var subscription6 = subscriber.AsObservable<SensorData>(cancellationToken: cts.Token)
             .Select(data => (int)data.Temperature) // Convert to integer temperature
             .DistinctUntilChanged() // Only emit when temperature changes
-            .Subscribe(temp => 
+            .Subscribe(temp =>
                 Console.WriteLine($"[Changed] Temperature changed to {temp}°C"));
 
         await Task.Delay(5000, cts.Token);

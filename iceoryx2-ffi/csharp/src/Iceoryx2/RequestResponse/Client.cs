@@ -10,9 +10,9 @@
 //
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
+using Iceoryx2.SafeHandles;
 using System;
 using System.Runtime.InteropServices;
-using Iceoryx2.SafeHandles;
 using static Iceoryx2.Native.Iox2NativeMethods;
 
 namespace Iceoryx2.RequestResponse;

@@ -47,7 +47,7 @@ public enum Iox2Error
     /// issues like communication breakdown, insufficient resources, or invalid state.
     /// </summary>
     SendFailed,
-    
+
     /// <summary>
     /// Represents an error condition where receiving data has failed.
     /// This may occur if the subscriber is unable to successfully retrieve

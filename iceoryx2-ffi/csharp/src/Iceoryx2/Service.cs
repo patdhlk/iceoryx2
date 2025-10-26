@@ -10,9 +10,9 @@
 //
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
+using Iceoryx2.SafeHandles;
 using System;
 using System.Runtime.InteropServices;
-using Iceoryx2.SafeHandles;
 
 namespace Iceoryx2;
 
@@ -36,7 +36,7 @@ public sealed class Service : IDisposable
     public Result<Publisher, Iox2Error> CreatePublisher()
     {
         ThrowIfDisposed();
-        
+
         try
         {
             // Create publisher builder - pass by reference for handle
@@ -44,7 +44,7 @@ public sealed class Service : IDisposable
             var publisherBuilderHandle = Native.Iox2NativeMethods.iox2_port_factory_pub_sub_publisher_builder(
                 ref portFactoryHandle,  // Pass by reference - C expects pointer to handle
                 IntPtr.Zero);  // NULL - let C allocate the struct
-            
+
             if (publisherBuilderHandle == IntPtr.Zero)
                 return Result<Publisher, Iox2Error>.Err(Iox2Error.PublisherCreationFailed);
 
@@ -53,13 +53,13 @@ public sealed class Service : IDisposable
                 publisherBuilderHandle,
                 IntPtr.Zero,  // NULL - let C allocate the struct
                 out var publisherHandle);
-            
+
             if (result != Native.Iox2NativeMethods.IOX2_OK || publisherHandle == IntPtr.Zero)
                 return Result<Publisher, Iox2Error>.Err(Iox2Error.PublisherCreationFailed);
-            
+
             var handle = new SafePublisherHandle(publisherHandle);
             var publisher = new Publisher(handle);
-            
+
             return Result<Publisher, Iox2Error>.Ok(publisher);
         }
         catch (Exception)
@@ -74,7 +74,7 @@ public sealed class Service : IDisposable
     public Result<Subscriber, Iox2Error> CreateSubscriber()
     {
         ThrowIfDisposed();
-        
+
         try
         {
             // Create subscriber builder - pass by reference for handle
@@ -82,7 +82,7 @@ public sealed class Service : IDisposable
             var subscriberBuilderHandle = Native.Iox2NativeMethods.iox2_port_factory_pub_sub_subscriber_builder(
                 ref portFactoryHandle,  // Pass by reference - C expects pointer to handle
                 IntPtr.Zero);  // NULL - let C allocate the struct
-            
+
             if (subscriberBuilderHandle == IntPtr.Zero)
                 return Result<Subscriber, Iox2Error>.Err(Iox2Error.SubscriberCreationFailed);
 
@@ -91,13 +91,13 @@ public sealed class Service : IDisposable
                 subscriberBuilderHandle,
                 IntPtr.Zero,  // NULL - let C allocate the struct
                 out var subscriberHandle);
-            
+
             if (result != Native.Iox2NativeMethods.IOX2_OK || subscriberHandle == IntPtr.Zero)
                 return Result<Subscriber, Iox2Error>.Err(Iox2Error.SubscriberCreationFailed);
-            
+
             var handle = new SafeSubscriberHandle(subscriberHandle);
             var subscriber = new Subscriber(handle);
-            
+
             return Result<Subscriber, Iox2Error>.Ok(subscriber);
         }
         catch (Exception)

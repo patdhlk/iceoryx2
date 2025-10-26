@@ -10,9 +10,9 @@
 //
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
+using Iceoryx2.SafeHandles;
 using System;
 using System.Runtime.InteropServices;
-using Iceoryx2.SafeHandles;
 
 namespace Iceoryx2;
 
@@ -35,7 +35,7 @@ public sealed class Publisher : IDisposable
     public Result<Sample<T>, Iox2Error> Loan<T>() where T : unmanaged
     {
         ThrowIfDisposed();
-        
+
         try
         {
             // Loan sample - pass by reference for publisher handle
@@ -45,7 +45,7 @@ public sealed class Publisher : IDisposable
                 IntPtr.Zero,  // NULL - let C allocate the struct
                 out var sampleHandle,
                 (UIntPtr)1);  // size_t in C = UIntPtr in C#
-            
+
             if (result != Native.Iox2NativeMethods.IOX2_OK || sampleHandle == IntPtr.Zero)
                 return Result<Sample<T>, Iox2Error>.Err(Iox2Error.SampleLoanFailed);
 
@@ -53,7 +53,7 @@ public sealed class Publisher : IDisposable
 
             var handle = new SafeSampleHandle(sampleHandle, isMutable: true);
             var sample = new Sample<T>(handle);
-            
+
             return Result<Sample<T>, Iox2Error>.Ok(sample);
         }
         catch (Exception)

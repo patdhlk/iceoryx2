@@ -1,7 +1,7 @@
+using Iceoryx2;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Iceoryx2;
 
 namespace AsyncPubSubExample;
 

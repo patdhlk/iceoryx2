@@ -10,9 +10,9 @@
 //
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
+using Iceoryx2.SafeHandles;
 using System;
 using System.Runtime.InteropServices;
-using Iceoryx2.SafeHandles;
 
 namespace Iceoryx2;
 
@@ -101,7 +101,7 @@ public sealed class WaitSet : IDisposable
 
         var waitsetHandle = _handle.DangerousGetHandle();
         var listenerHandle = listener.GetHandle();
-        
+
         // Get file descriptor from listener
         var fd = Native.Iox2NativeMethods.iox2_listener_get_file_descriptor(ref listenerHandle);
         if (fd == IntPtr.Zero)
@@ -136,7 +136,7 @@ public sealed class WaitSet : IDisposable
 
         var waitsetHandle = _handle.DangerousGetHandle();
         var listenerHandle = listener.GetHandle();
-        
+
         // Get file descriptor from listener
         var fd = Native.Iox2NativeMethods.iox2_listener_get_file_descriptor(ref listenerHandle);
         if (fd == IntPtr.Zero)

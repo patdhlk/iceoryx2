@@ -101,7 +101,7 @@ public sealed class RequestResponseServiceBuilder<TRequest, TResponse>
             var requestTypeName = ServiceBuilder.GetRustCompatibleTypeName<TRequest>();
             var requestTypeSize = (ulong)sizeof(TRequest);
             var requestTypeAlignment = GetAlignment<TRequest>(requestTypeSize);
-            
+
             var requestResult = iox2_service_builder_request_response_set_request_payload_type_details(
                 ref requestResponseBuilderHandle,
                 iox2_type_variant_e.FIXED_SIZE,
@@ -119,7 +119,7 @@ public sealed class RequestResponseServiceBuilder<TRequest, TResponse>
             var responseTypeName = ServiceBuilder.GetRustCompatibleTypeName<TResponse>();
             var responseTypeSize = (ulong)sizeof(TResponse);
             var responseTypeAlignment = GetAlignment<TResponse>(responseTypeSize);
-            
+
             var responseResult = iox2_service_builder_request_response_set_response_payload_type_details(
                 ref requestResponseBuilderHandle,
                 iox2_type_variant_e.FIXED_SIZE,

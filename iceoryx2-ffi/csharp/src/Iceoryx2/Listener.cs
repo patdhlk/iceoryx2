@@ -10,10 +10,10 @@
 //
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
+using Iceoryx2.SafeHandles;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Iceoryx2.SafeHandles;
 
 namespace Iceoryx2;
 
@@ -41,7 +41,7 @@ public sealed class Listener : IDisposable
     public Result<EventId?, Iox2Error> TryWait()
     {
         ThrowIfDisposed();
-        
+
         try
         {
             var listenerHandle = _handle.DangerousGetHandle();
@@ -49,7 +49,7 @@ public sealed class Listener : IDisposable
                 ref listenerHandle,
                 out var nativeEventId,
                 out var hasReceivedOne);
-            
+
             if (result != Native.Iox2NativeMethods.IOX2_OK)
                 return Result<EventId?, Iox2Error>.Err(Iox2Error.WaitFailed);
 
@@ -76,20 +76,20 @@ public sealed class Listener : IDisposable
     public Result<EventId?, Iox2Error> TimedWait(TimeSpan timeout)
     {
         ThrowIfDisposed();
-        
+
         try
         {
             var listenerHandle = _handle.DangerousGetHandle();
             var seconds = (ulong)timeout.TotalSeconds;
             var nanoseconds = (uint)((timeout.TotalSeconds - seconds) * 1_000_000_000);
-            
+
             var result = Native.Iox2NativeMethods.iox2_listener_timed_wait_one(
                 ref listenerHandle,
                 out var nativeEventId,
                 out var hasReceivedOne,
                 seconds,
                 nanoseconds);
-            
+
             if (result != Native.Iox2NativeMethods.IOX2_OK)
                 return Result<EventId?, Iox2Error>.Err(Iox2Error.WaitFailed);
 
@@ -118,7 +118,7 @@ public sealed class Listener : IDisposable
     public Task<Result<EventId?, Iox2Error>> WaitAsync(TimeSpan timeout, CancellationToken cancellationToken = default)
     {
         ThrowIfDisposed();
-        
+
         return Task.Run(() =>
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -138,7 +138,7 @@ public sealed class Listener : IDisposable
     public Task<Result<EventId, Iox2Error>> WaitAsync(CancellationToken cancellationToken = default)
     {
         ThrowIfDisposed();
-        
+
         return Task.Run(() =>
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -157,7 +157,7 @@ public sealed class Listener : IDisposable
     public Result<EventId, Iox2Error> BlockingWait()
     {
         ThrowIfDisposed();
-        
+
         try
         {
             var listenerHandle = _handle.DangerousGetHandle();
@@ -165,7 +165,7 @@ public sealed class Listener : IDisposable
                 ref listenerHandle,
                 out var nativeEventId,
                 out var hasReceivedOne);
-            
+
             if (result != Native.Iox2NativeMethods.IOX2_OK)
                 return Result<EventId, Iox2Error>.Err(Iox2Error.WaitFailed);
 

@@ -52,88 +52,88 @@ public static class ListenerExtensions
         return Observable.Create<EventId>(observer =>
         {
             var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-            
+
             var task = Task.Run(() =>
             {
-                using var waitset = WaitSetBuilder.New()
-                    .Create()
-                    .Expect("Failed to create WaitSet");
+                  using var waitset = WaitSetBuilder.New()
+                      .Create()
+                      .Expect("Failed to create WaitSet");
 
-                using var guard = deadline.HasValue
-                    ? waitset.AttachDeadline(listener, deadline.Value).Expect("Failed to attach listener with deadline")
-                    : waitset.AttachNotification(listener).Expect("Failed to attach listener");
+                  using var guard = deadline.HasValue
+                      ? waitset.AttachDeadline(listener, deadline.Value).Expect("Failed to attach listener with deadline")
+                      : waitset.AttachNotification(listener).Expect("Failed to attach listener");
 
-                try
-                {
-                    while (!cts.Token.IsCancellationRequested)
-                    {
-                        var waitResult = waitset.WaitAndProcess((attachmentId) =>
-                        {
-                            if (attachmentId.HasEventFrom(guard))
-                            {
-                                if (deadline.HasValue && attachmentId.HasMissedDeadline(guard))
-                                {
-                                    // Deadline missed - continue waiting
-                                    return CallbackProgression.Continue;
-                                }
+                  try
+                  {
+                      while (!cts.Token.IsCancellationRequested)
+                      {
+                          var waitResult = waitset.WaitAndProcess((attachmentId) =>
+                          {
+                          if (attachmentId.HasEventFrom(guard))
+                          {
+                              if (deadline.HasValue && attachmentId.HasMissedDeadline(guard))
+                              {
+                                      // Deadline missed - continue waiting
+                                  return CallbackProgression.Continue;
+                              }
 
-                                // Event available - consume all pending events
-                                while (true)
-                                {
-                                    var eventResult = listener.TryWait();
-                                    if (eventResult.IsOk)
-                                    {
-                                        var eventIdOpt = eventResult.Unwrap();
-                                        if (eventIdOpt.HasValue)
-                                        {
-                                            observer.OnNext(eventIdOpt.Value);
-                                        }
-                                        else
-                                        {
-                                            break; // No more events
-                                        }
-                                    }
-                                    else
-                                    {
-                                        observer.OnError(new InvalidOperationException("Failed to receive event"));
-                                        return CallbackProgression.Stop;
-                                    }
-                                }
-                            }
-                            return CallbackProgression.Continue;
-                        });
+                                  // Event available - consume all pending events
+                              while (true)
+                              {
+                                  var eventResult = listener.TryWait();
+                                  if (eventResult.IsOk)
+                                  {
+                                      var eventIdOpt = eventResult.Unwrap();
+                                      if (eventIdOpt.HasValue)
+                                      {
+                                          observer.OnNext(eventIdOpt.Value);
+                                      }
+                                      else
+                                      {
+                                          break; // No more events
+                                      }
+                                  }
+                                  else
+                                  {
+                                      observer.OnError(new InvalidOperationException("Failed to receive event"));
+                                      return CallbackProgression.Stop;
+                                  }
+                              }
+                          }
+                          return CallbackProgression.Continue;
+                      });
 
-                        if (!waitResult.IsOk)
-                        {
-                            observer.OnError(new InvalidOperationException("WaitSet failed"));
-                            break;
-                        }
-                    }
-                    observer.OnCompleted();
-                }
-                catch (OperationCanceledException)
-                {
-                    observer.OnCompleted();
-                }
-                catch (Exception ex)
-                {
-                    observer.OnError(ex);
-                }
-            }, cts.Token);
+                          if (!waitResult.IsOk)
+                          {
+                              observer.OnError(new InvalidOperationException("WaitSet failed"));
+                              break;
+                          }
+                      }
+                      observer.OnCompleted();
+                  }
+                  catch (OperationCanceledException)
+                  {
+                      observer.OnCompleted();
+                  }
+                  catch (Exception ex)
+                  {
+                      observer.OnError(ex);
+                  }
+              }, cts.Token);
 
             return Disposable.Create(() =>
             {
-                cts.Cancel();
-                try
-                {
-                    task.Wait(TimeSpan.FromSeconds(1));
-                }
-                catch (AggregateException)
-                {
+                  cts.Cancel();
+                  try
+                  {
+                      task.Wait(TimeSpan.FromSeconds(1));
+                  }
+                  catch (AggregateException)
+                  {
                     // Expected when cancelled
-                }
-                cts.Dispose();
-            });
+                  }
+                  cts.Dispose();
+              });
         });
     }
 
@@ -184,7 +184,7 @@ public static class ListenerExtensions
                         // Deadline missed
                         return CallbackProgression.Continue;
                     }
-                    
+
                     // Event available
                     return CallbackProgression.Stop;
                 }

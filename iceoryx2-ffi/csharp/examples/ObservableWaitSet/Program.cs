@@ -10,9 +10,9 @@
 //
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
-using System.Reactive.Linq;
-using System.Reactive.Disposables;
 using Iceoryx2;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
 
 /// <summary>
 /// Represents an event received from a service with metadata
@@ -94,32 +94,32 @@ static class WaitSetObservableExtensions
             // Run WaitSet in background task
             var waitTask = Task.Run(() =>
             {
-                try
-                {
-                    var result = waitSet.WaitAndProcess(OnEvent);
-                    observer.OnCompleted();
-                }
-                catch (Exception ex)
-                {
-                    observer.OnError(ex);
-                }
-            }, cts.Token);
+                  try
+                  {
+                      var result = waitSet.WaitAndProcess(OnEvent);
+                      observer.OnCompleted();
+                  }
+                  catch (Exception ex)
+                  {
+                      observer.OnError(ex);
+                  }
+              }, cts.Token);
 
             // Return disposable that stops the WaitSet
             return new CompositeDisposable(
                 cts,
                 Disposable.Create(() =>
                 {
-                    waitSet.Stop();
-                    try
-                    {
-                        waitTask.Wait(TimeSpan.FromSeconds(5));
-                    }
-                    catch
-                    {
+                      waitSet.Stop();
+                      try
+                      {
+                          waitTask.Wait(TimeSpan.FromSeconds(5));
+                      }
+                      catch
+                      {
                         // Ignore timeout/cancellation
-                    }
-                })
+                      }
+                  })
             );
         });
     }

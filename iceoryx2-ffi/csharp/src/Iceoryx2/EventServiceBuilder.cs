@@ -10,8 +10,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
-using System;
 using Iceoryx2.SafeHandles;
+using System;
 
 namespace Iceoryx2;
 
@@ -37,18 +37,18 @@ public sealed class EventServiceBuilder
     {
         if (serviceName == null)
             throw new ArgumentNullException(nameof(serviceName));
-        
+
         try
         {
             // Create service name
             var serviceNameBytes = System.Text.Encoding.UTF8.GetByteCount(serviceName);
-            
+
             var result = Native.Iox2NativeMethods.iox2_service_name_new(
                 IntPtr.Zero,  // pass IntPtr.Zero to use default storage allocation
                 serviceName,
                 serviceNameBytes,
                 out var serviceNameHandle);
-            
+
             if (result != Native.Iox2NativeMethods.IOX2_OK)
                 return Result<EventService, Iox2Error>.Err(Iox2Error.EventServiceCreationFailed);
 
@@ -82,13 +82,13 @@ public sealed class EventServiceBuilder
 
             if (openResult != Native.Iox2NativeMethods.IOX2_OK)
                 return Result<EventService, Iox2Error>.Err(Iox2Error.EventServiceCreationFailed);
-            
+
             if (portFactoryHandle == IntPtr.Zero)
                 return Result<EventService, Iox2Error>.Err(Iox2Error.EventServiceCreationFailed);
 
             var handle = new SafeEventServiceHandle(portFactoryHandle);
             var service = new EventService(handle);
-            
+
             return Result<EventService, Iox2Error>.Ok(service);
         }
         catch (Exception)
@@ -107,18 +107,18 @@ public sealed class EventServiceBuilder
     {
         if (serviceName == null)
             throw new ArgumentNullException(nameof(serviceName));
-        
+
         try
         {
             // Create service name
             var serviceNameBytes = System.Text.Encoding.UTF8.GetByteCount(serviceName);
-            
+
             var result = Native.Iox2NativeMethods.iox2_service_name_new(
                 IntPtr.Zero,
                 serviceName,
                 serviceNameBytes,
                 out var serviceNameHandle);
-            
+
             if (result != Native.Iox2NativeMethods.IOX2_OK)
                 return Result<EventService, Iox2Error>.Err(Iox2Error.EventServiceCreationFailed);
 
@@ -152,13 +152,13 @@ public sealed class EventServiceBuilder
 
             if (createResult != Native.Iox2NativeMethods.IOX2_OK)
                 return Result<EventService, Iox2Error>.Err(Iox2Error.EventServiceCreationFailed);
-            
+
             if (portFactoryHandle == IntPtr.Zero)
                 return Result<EventService, Iox2Error>.Err(Iox2Error.EventServiceCreationFailed);
 
             var handle = new SafeEventServiceHandle(portFactoryHandle);
             var service = new EventService(handle);
-            
+
             return Result<EventService, Iox2Error>.Ok(service);
         }
         catch (Exception)

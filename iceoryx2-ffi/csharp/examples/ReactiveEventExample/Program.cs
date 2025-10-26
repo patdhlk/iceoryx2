@@ -12,11 +12,11 @@
 
 using Iceoryx2;
 using Iceoryx2.Reactive;
-using System.Reactive.Linq;
-using System.Threading.Tasks;
 using System;
-using System.Threading;
 using System.Linq;
+using System.Reactive.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 /// <summary>
 /// Reactive Event Example - Demonstrates event-driven Observable usage with Listener and Notifier.
@@ -138,9 +138,9 @@ class Program
             while (!cts.Token.IsCancellationRequested)
             {
                 var eventId = events[(int)(counter % (ulong)events.Length)];
-                
+
                 notifier.Notify(eventId).Expect("Failed to notify");
-                
+
                 var eventName = GetEventName(eventId);
                 Console.WriteLine($"[{DateTime.Now:HH:mm:ss.fff}] Triggered: {eventName} (ID: {eventId.Value})");
 
@@ -201,7 +201,7 @@ class Program
         // ========================================
         Console.WriteLine("═══ Example 1: Basic Event Observable (Event-Driven!) ═══");
         Console.WriteLine("Note: This uses WaitSet internally - true async events, no polling!\n");
-        
+
         using var subscription1 = listener.AsObservable(cancellationToken: cts.Token)
             .Subscribe(
                 eventId => Console.WriteLine($"[Basic] Event received: {GetEventName(eventId)} (ID: {eventId.Value})"),
@@ -218,7 +218,7 @@ class Program
 
         using var subscription2 = listener.AsObservable(cancellationToken: cts.Token)
             .Where(eventId => eventId.Value is >= 10 and < 20) // Alert range
-            .Subscribe(eventId => 
+            .Subscribe(eventId =>
                 Console.WriteLine($"[ALERT!] {GetEventName(eventId)} (ID: {eventId.Value})"));
 
         await Task.Delay(5000, cts.Token);
@@ -230,15 +230,15 @@ class Program
         subscription2.Dispose();
 
         using var subscription3 = listener.AsObservable(cancellationToken: cts.Token)
-            .Select(eventId => new 
-            { 
+            .Select(eventId => new
+            {
                 Event = GetEventName(eventId),
                 Id = eventId.Value,
                 Category = GetEventCategory(eventId),
                 Severity = GetEventSeverity(eventId),
                 Timestamp = DateTime.Now
             })
-            .Subscribe(summary => 
+            .Subscribe(summary =>
                 Console.WriteLine($"[Summary] {summary.Timestamp:HH:mm:ss.fff} - {summary.Category}/{summary.Severity}: {summary.Event}"));
 
         await Task.Delay(5000, cts.Token);
@@ -272,7 +272,7 @@ class Program
 
         using var subscription5 = listener.AsObservable(cancellationToken: cts.Token)
             .Where(eventId => GetEventSeverity(eventId) == "Critical")
-            .Subscribe(eventId => 
+            .Subscribe(eventId =>
                 Console.WriteLine($"[🚨 CRITICAL!] {GetEventName(eventId)} - Immediate action required!"));
 
         await Task.Delay(5000, cts.Token);
@@ -286,7 +286,7 @@ class Program
         using var subscription6 = listener.AsObservable(cancellationToken: cts.Token)
             .Where(eventId => eventId.Value == 30) // Heartbeat events
             .Throttle(TimeSpan.FromSeconds(1))
-            .Subscribe(eventId => 
+            .Subscribe(eventId =>
                 Console.WriteLine($"[Throttled] Heartbeat stream paused for 1 second"));
 
         await Task.Delay(8000, cts.Token);
@@ -321,13 +321,13 @@ class Program
         Console.WriteLine("\n═══ Example 8: Async Enumerable (await foreach) ═══");
         subscription7.Dispose();
 
-        var count = 0;
-        await foreach (var eventId in listener.AsAsyncEnumerable(cancellationToken: cts.Token))
-        {
-            Console.WriteLine($"[AsyncEnum] {GetEventName(eventId)} (ID: {eventId.Value})");
-            if (++count >= 5)
-                break;
-        }
+        // var count = 0;
+        // await foreach (var eventId in listener.AsAsyncEnumerable(cancellationToken: cts.Token))
+        // {
+        //     Console.WriteLine($"[AsyncEnum] {GetEventName(eventId)} (ID: {eventId.Value})");
+        //     if (++count >= 5)
+        //         break;
+        // }
 
         // ========================================
         // Example 9: Deadline Monitoring
@@ -344,6 +344,7 @@ class Program
             });
 
         await Task.Delay(10000, cts.Token);
+        subscription9.Dispose();
 
         Console.WriteLine("\n✓ All examples completed!");
         Console.WriteLine("Press any key to exit...");

@@ -41,9 +41,9 @@ public sealed class RequestMut<TRequest, TResponse> : IDisposable
         get
         {
             ThrowIfDisposed();
-            
+
             iox2_request_mut_payload_mut(ref _handle, out var payloadPtr, out var payloadLen);
-            
+
             if (payloadPtr == IntPtr.Zero)
             {
                 throw new InvalidOperationException("Failed to get request payload");
@@ -54,9 +54,9 @@ public sealed class RequestMut<TRequest, TResponse> : IDisposable
         set
         {
             ThrowIfDisposed();
-            
+
             iox2_request_mut_payload_mut(ref _handle, out var payloadPtr, out var payloadLen);
-            
+
             if (payloadPtr == IntPtr.Zero)
             {
                 throw new InvalidOperationException("Failed to get request payload");

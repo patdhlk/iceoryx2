@@ -10,8 +10,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
-using System;
 using Iceoryx2.SafeHandles;
+using System;
 
 namespace Iceoryx2;
 
@@ -39,14 +39,14 @@ public sealed class Notifier : IDisposable
     public Result<Unit, Iox2Error> Notify()
     {
         ThrowIfDisposed();
-        
+
         try
         {
             var notifierHandle = _handle.DangerousGetHandle();
             var result = Native.Iox2NativeMethods.iox2_notifier_notify(
                 ref notifierHandle,
                 IntPtr.Zero);  // Pass NULL for listener count
-            
+
             if (result != Native.Iox2NativeMethods.IOX2_OK)
                 return Result<Unit, Iox2Error>.Err(Iox2Error.NotifyFailed);
 
@@ -69,7 +69,7 @@ public sealed class Notifier : IDisposable
     public Result<Unit, Iox2Error> Notify(EventId eventId)
     {
         ThrowIfDisposed();
-        
+
         try
         {
             var notifierHandle = _handle.DangerousGetHandle();
@@ -78,7 +78,7 @@ public sealed class Notifier : IDisposable
                 ref notifierHandle,
                 ref nativeEventId,
                 IntPtr.Zero);  // Pass NULL for listener count
-            
+
             if (result != Native.Iox2NativeMethods.IOX2_OK)
                 return Result<Unit, Iox2Error>.Err(Iox2Error.NotifyFailed);
 

@@ -54,13 +54,13 @@ public readonly struct EventId : IEquatable<EventId>
 
     /// <inheritdoc/>
     public bool Equals(EventId other) => _value == other._value;
-    
+
     /// <inheritdoc/>
     public override bool Equals(object? obj) => obj is EventId other && Equals(other);
-    
+
     /// <inheritdoc/>
     public override int GetHashCode() => _value.GetHashCode();
-    
+
     /// <inheritdoc/>
     public override string ToString() => _value.ToString();
 
@@ -68,7 +68,7 @@ public readonly struct EventId : IEquatable<EventId>
     /// Determines whether two EventId instances are equal.
     /// </summary>
     public static bool operator ==(EventId left, EventId right) => left.Equals(right);
-    
+
     /// <summary>
     /// Determines whether two EventId instances are not equal.
     /// </summary>
@@ -78,7 +78,7 @@ public readonly struct EventId : IEquatable<EventId>
     /// Implicitly converts an EventId to a ulong value.
     /// </summary>
     public static implicit operator ulong(EventId eventId) => eventId._value;
-    
+
     /// <summary>
     /// Implicitly converts a ulong value to an EventId.
     /// </summary>

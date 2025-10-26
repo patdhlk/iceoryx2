@@ -1,5 +1,5 @@
-using System;
 using Iceoryx2;
+using System;
 
 namespace RuntimeTest;
 
@@ -16,7 +16,7 @@ class Program
             Console.WriteLine("Test 1: Creating a node...");
             Console.WriteLine("  Step 1: Calling NodeBuilder.New()");
             var builder = NodeBuilder.New();
-            
+
             Console.WriteLine("  Step 2: Calling Create() WITHOUT name");
             var nodeResult = builder.Create();
 
@@ -76,7 +76,7 @@ class Program
 
             var sample = sampleResult.Unwrap();
             sample.Payload = 42;
-            
+
             var sendResult = sample.Send();
             if (!sendResult.IsOk)
             {
@@ -104,7 +104,7 @@ class Program
             Console.WriteLine("============================");
             Console.WriteLine("✓ All tests passed!");
             Console.WriteLine("============================");
-            
+
             return 0;
         }
         catch (Exception ex)

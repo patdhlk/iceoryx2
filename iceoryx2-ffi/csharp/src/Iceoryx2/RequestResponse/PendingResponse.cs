@@ -10,10 +10,10 @@
 //
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
+using Iceoryx2.SafeHandles;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Iceoryx2.SafeHandles;
 using static Iceoryx2.Native.Iox2NativeMethods;
 
 namespace Iceoryx2.RequestResponse;
@@ -97,7 +97,7 @@ public sealed class PendingResponse<TResponse> : IDisposable
         ThrowIfDisposed();
 
         var stopwatch = System.Diagnostics.Stopwatch.StartNew();
-        
+
         while (stopwatch.Elapsed < timeout)
         {
             var result = Receive();
@@ -131,7 +131,7 @@ public sealed class PendingResponse<TResponse> : IDisposable
         ThrowIfDisposed();
 
         var stopwatch = System.Diagnostics.Stopwatch.StartNew();
-        
+
         while (stopwatch.Elapsed < timeout)
         {
             cancellationToken.ThrowIfCancellationRequested();

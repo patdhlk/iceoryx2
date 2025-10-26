@@ -1,7 +1,7 @@
+using Iceoryx2;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Iceoryx2;
 
 namespace PublishSubscribeExample;
 
@@ -56,7 +56,7 @@ class ProgramAsync
             Console.WriteLine($"Sent: {counter}");
 
             counter++;
-            
+
             // Use async delay instead of Thread.Sleep
             await Task.Delay(1000, cancellationToken);
         }

@@ -35,13 +35,13 @@ class Program
 
         // Set log level from environment variable IOX2_LOG_LEVEL (or default to Info)
         Iox2Log.SetLogLevelFromEnvOrDefault();
-        
+
         // Use the built-in console logger
         if (Iox2Log.UseConsoleLogger())
         {
             Console.WriteLine("Console logger initialized successfully");
         }
-        
+
         Console.WriteLine($"Current log level: {Iox2Log.GetLogLevel()}");
         Console.WriteLine();
 
@@ -51,13 +51,13 @@ class Program
         Iox2Log.Write(LogLevel.Info, "ExampleApp", "This is an INFO message");
         Iox2Log.Write(LogLevel.Warn, "ExampleApp", "This is a WARN message");
         Iox2Log.Write(LogLevel.Error, "ExampleApp", "This is an ERROR message");
-        
+
         Console.WriteLine();
         Console.WriteLine("Try setting IOX2_LOG_LEVEL environment variable:");
         Console.WriteLine("  export IOX2_LOG_LEVEL=TRACE");
         Console.WriteLine("  export IOX2_LOG_LEVEL=DEBUG");
         Console.WriteLine("  export IOX2_LOG_LEVEL=WARN");
-        
+
         // Create a simple service to see library logs
         Console.WriteLine();
         Console.WriteLine("Creating iceoryx2 node (will generate library logs)...");
@@ -65,7 +65,7 @@ class Program
             .Name("logging_example")
             .Create()
             .Expect("Failed to create node");
-            
+
         Console.WriteLine("Node created successfully!");
     }
 
@@ -111,7 +111,7 @@ class Program
             Console.WriteLine("Failed to set custom logger (may have been set already)");
             return;
         }
-        
+
         Console.WriteLine();
 
         // Set log level to see all messages
@@ -124,16 +124,16 @@ class Program
         Iox2Log.Write(LogLevel.Warn, "CustomApp", "Warn: Warning message");
         Iox2Log.Write(LogLevel.Error, "CustomApp", "Error: Something went wrong");
         Iox2Log.Write(LogLevel.Fatal, "CustomApp", "Fatal: Critical error!");
-        
+
         Console.WriteLine();
-        
+
         // Create a node to see library logs with custom formatting
         Console.WriteLine("Creating iceoryx2 node with custom logger...");
         var node = NodeBuilder.New()
             .Name("custom_logging_example")
             .Create()
             .Expect("Failed to create node");
-            
+
         Console.WriteLine("Node created!");
     }
 
@@ -143,7 +143,7 @@ class Program
         Console.WriteLine();
 
         var logFile = "/tmp/iceoryx2_csharp.log";
-        
+
         // Use file logger
         if (Iox2Log.UseFileLogger(logFile))
         {
@@ -166,14 +166,14 @@ class Program
         Iox2Log.Write(LogLevel.Info, "FileLogging", "Info message to file");
         Iox2Log.Write(LogLevel.Warn, "FileLogging", "Warning message to file");
         Iox2Log.Write(LogLevel.Error, "FileLogging", "Error message to file");
-        
+
         // Create a node to generate library logs
         Console.WriteLine("Creating iceoryx2 node (logs will be written to file)...");
         var node = NodeBuilder.New()
             .Name("file_logging_example")
             .Create()
             .Expect("Failed to create node");
-            
+
         Console.WriteLine("Node created!");
         Console.WriteLine();
         Console.WriteLine($"Check the log file: cat {logFile}");

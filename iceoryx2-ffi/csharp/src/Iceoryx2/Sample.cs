@@ -1,6 +1,6 @@
+using Iceoryx2.SafeHandles;
 using System;
 using System.Runtime.InteropServices;
-using Iceoryx2.SafeHandles;
 
 namespace Iceoryx2;
 
@@ -21,11 +21,11 @@ public sealed class Sample<T> : IDisposable where T : unmanaged
     {
         var sampleHandle = _handle.DangerousGetHandle();
         Console.WriteLine($"[DUMP] {context}: sampleHandle=0x{sampleHandle.ToInt64():X}");
-        
+
         // Read first 128 bytes of the sample struct to see the service_type, storage bytes, and deleter
         byte[] buffer = new byte[128];
         Marshal.Copy(sampleHandle, buffer, 0, 128);
-        
+
         Console.Write($"[DUMP] First 128 bytes: ");
         for (int i = 0; i < Math.Min(128, buffer.Length); i++)
         {
@@ -59,9 +59,9 @@ public sealed class Sample<T> : IDisposable where T : unmanaged
         set
         {
             ThrowIfDisposed();
-            
+
             DumpSampleMemory("Before payload write");
-            
+
             var sampleHandle = _handle.DangerousGetHandle();
             Console.WriteLine($"[DEBUG] About to call iox2_sample_mut_payload_mut with handle={sampleHandle}");
             IntPtr payloadPtr;
@@ -100,7 +100,7 @@ public sealed class Sample<T> : IDisposable where T : unmanaged
             {
                 Marshal.FreeHGlobal(tmp);
             }
-            
+
             DumpSampleMemory("After payload write");
         }
     }
@@ -111,9 +111,9 @@ public sealed class Sample<T> : IDisposable where T : unmanaged
     public Result<Unit, Iox2Error> Send()
     {
         ThrowIfDisposed();
-        
+
         DumpSampleMemory("Before send");
-        
+
         try
         {
             var sampleHandle = _handle.DangerousGetHandle();
@@ -122,14 +122,14 @@ public sealed class Sample<T> : IDisposable where T : unmanaged
             var result = Native.Iox2NativeMethods.iox2_sample_mut_send(
                 sampleHandle,
                 IntPtr.Zero);
-            
+
             if (result != Native.Iox2NativeMethods.IOX2_OK)
                 return Result<Unit, Iox2Error>.Err(Iox2Error.SendFailed);
 
             // The handle is consumed by send
             _handle.SetHandleAsInvalid();
             _disposed = true;
-            
+
             return Result<Unit, Iox2Error>.Ok(Unit.Value);
         }
         catch (Exception)

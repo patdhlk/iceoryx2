@@ -43,7 +43,7 @@ public sealed class Iox2TypeAttribute : Attribute
     /// Gets the type name to use for cross-language type identification.
     /// </summary>
     public string TypeName { get; }
-    
+
     /// <summary>
     /// Initializes a new instance of the <see cref="Iox2TypeAttribute"/> class.
     /// </summary>

@@ -38,9 +38,9 @@ public sealed class Response<TResponse> : IDisposable
         get
         {
             ThrowIfDisposed();
-            
+
             iox2_response_payload(ref _handle, out var payloadPtr, out var payloadLen);
-            
+
             if (payloadPtr == IntPtr.Zero)
             {
                 throw new InvalidOperationException("Failed to get response payload");

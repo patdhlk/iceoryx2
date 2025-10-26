@@ -1,5 +1,5 @@
-using System;
 using Iceoryx2.SafeHandles;
+using System;
 
 namespace Iceoryx2;
 
@@ -38,7 +38,7 @@ public sealed class NodeBuilder
             // Create node builder with proper struct
             var builderStruct = new Native.Iox2NativeMethods.iox2_node_builder_t();
             var builderHandle = Native.Iox2NativeMethods.iox2_node_builder_new(ref builderStruct);
-            
+
             if (builderHandle == IntPtr.Zero)
                 return Result<Node, Iox2Error>.Err(Iox2Error.NodeCreationFailed);
 
@@ -50,7 +50,7 @@ public sealed class NodeBuilder
                     _name,
                     System.Text.Encoding.UTF8.GetByteCount(_name),
                     out var nodeNameHandle);
-                
+
                 if (result == Native.Iox2NativeMethods.IOX2_OK)
                 {
                     var nodeNamePtr = Native.Iox2NativeMethods.iox2_cast_node_name_ptr(nodeNameHandle);
@@ -67,14 +67,14 @@ public sealed class NodeBuilder
                 IntPtr.Zero,  // NULL - let C allocate the struct on heap
                 serviceType,
                 out var nodeHandle);
-            
+
             Console.WriteLine($"[DEBUG] Node created with result: {createResult}, handle: {nodeHandle}");
             if (createResult != Native.Iox2NativeMethods.IOX2_OK || nodeHandle == IntPtr.Zero)
                 return Result<Node, Iox2Error>.Err(Iox2Error.NodeCreationFailed);
 
             var handle = new SafeNodeHandle(nodeHandle);
             var node = new Node(handle);
-            
+
             return Result<Node, Iox2Error>.Ok(node);
         }
         catch (Exception ex)

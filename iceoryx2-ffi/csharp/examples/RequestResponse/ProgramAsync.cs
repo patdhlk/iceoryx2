@@ -1,9 +1,9 @@
+using Iceoryx2;
+using Iceoryx2.RequestResponse;
 using System;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
-using Iceoryx2;
-using Iceoryx2.RequestResponse;
 
 namespace RequestResponseExample;
 
@@ -73,7 +73,7 @@ class ProgramAsync
 
             // Wait for response asynchronously with 2-second timeout
             var responseResult = await pendingResponse.ReceiveAsync(
-                TimeSpan.FromSeconds(2), 
+                TimeSpan.FromSeconds(2),
                 cancellationToken);
 
             if (!responseResult.IsOk)

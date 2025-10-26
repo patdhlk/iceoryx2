@@ -10,9 +10,9 @@
 //
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
+using Iceoryx2.Native;
 using System;
 using System.Runtime.InteropServices;
-using Iceoryx2.Native;
 
 namespace Iceoryx2;
 
@@ -154,7 +154,7 @@ public static class Iox2Log
         {
             unsafe
             {
-                var originStr = origin != IntPtr.Zero 
+                var originStr = origin != IntPtr.Zero
                     ? Marshal.PtrToStringUTF8(origin) ?? string.Empty
                     : string.Empty;
                 var messageStr = Marshal.PtrToStringUTF8(message) ?? string.Empty;

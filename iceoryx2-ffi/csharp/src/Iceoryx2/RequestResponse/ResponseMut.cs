@@ -39,9 +39,9 @@ public sealed class ResponseMut<TResponse> : IDisposable
         get
         {
             ThrowIfDisposed();
-            
+
             iox2_response_mut_payload_mut(ref _handle, out var payloadPtr, out var payloadLen);
-            
+
             if (payloadPtr == IntPtr.Zero)
             {
                 throw new InvalidOperationException("Failed to get response payload");
@@ -52,9 +52,9 @@ public sealed class ResponseMut<TResponse> : IDisposable
         set
         {
             ThrowIfDisposed();
-            
+
             iox2_response_mut_payload_mut(ref _handle, out var payloadPtr, out var payloadLen);
-            
+
             if (payloadPtr == IntPtr.Zero)
             {
                 throw new InvalidOperationException("Failed to get response payload");

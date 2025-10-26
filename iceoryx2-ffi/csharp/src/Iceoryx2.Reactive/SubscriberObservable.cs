@@ -41,7 +41,7 @@ internal sealed class SubscriberObservable<T> : IObservable<T> where T : unmanag
             throw new ArgumentNullException(nameof(observer));
 
         var cts = CancellationTokenSource.CreateLinkedTokenSource(_cancellationToken);
-        
+
         // Start polling task
         var pollingTask = Task.Run(async () =>
         {
@@ -53,7 +53,7 @@ internal sealed class SubscriberObservable<T> : IObservable<T> where T : unmanag
                     {
                         // Try to receive a sample
                         var result = _subscriber.Receive<T>();
-                        
+
                         if (result.IsOk)
                         {
                             var sample = result.Unwrap();

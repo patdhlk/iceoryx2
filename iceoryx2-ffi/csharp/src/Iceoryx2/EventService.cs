@@ -10,8 +10,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
-using System;
 using Iceoryx2.SafeHandles;
+using System;
 
 namespace Iceoryx2;
 
@@ -37,7 +37,7 @@ public sealed class EventService : IDisposable
     public Result<Notifier, Iox2Error> CreateNotifier(EventId? defaultEventId = null)
     {
         ThrowIfDisposed();
-        
+
         try
         {
             // Create notifier builder - pass by reference for handle
@@ -45,7 +45,7 @@ public sealed class EventService : IDisposable
             var notifierBuilderHandle = Native.Iox2NativeMethods.iox2_port_factory_event_notifier_builder(
                 ref portFactoryHandle,  // Pass by reference - C expects pointer to handle
                 IntPtr.Zero);  // NULL - let C allocate the struct
-            
+
             if (notifierBuilderHandle == IntPtr.Zero)
                 return Result<Notifier, Iox2Error>.Err(Iox2Error.NotifierCreationFailed);
 
@@ -63,13 +63,13 @@ public sealed class EventService : IDisposable
                 notifierBuilderHandle,
                 IntPtr.Zero,  // NULL - let C allocate the struct
                 out var notifierHandle);
-            
+
             if (result != Native.Iox2NativeMethods.IOX2_OK || notifierHandle == IntPtr.Zero)
                 return Result<Notifier, Iox2Error>.Err(Iox2Error.NotifierCreationFailed);
-            
+
             var handle = new SafeNotifierHandle(notifierHandle);
             var notifier = new Notifier(handle);
-            
+
             return Result<Notifier, Iox2Error>.Ok(notifier);
         }
         catch (Exception)
@@ -85,7 +85,7 @@ public sealed class EventService : IDisposable
     public Result<Listener, Iox2Error> CreateListener()
     {
         ThrowIfDisposed();
-        
+
         try
         {
             // Create listener builder - pass by reference for handle
@@ -93,7 +93,7 @@ public sealed class EventService : IDisposable
             var listenerBuilderHandle = Native.Iox2NativeMethods.iox2_port_factory_event_listener_builder(
                 ref portFactoryHandle,  // Pass by reference - C expects pointer to handle
                 IntPtr.Zero);  // NULL - let C allocate the struct
-            
+
             if (listenerBuilderHandle == IntPtr.Zero)
                 return Result<Listener, Iox2Error>.Err(Iox2Error.ListenerCreationFailed);
 
@@ -102,13 +102,13 @@ public sealed class EventService : IDisposable
                 listenerBuilderHandle,
                 IntPtr.Zero,  // NULL - let C allocate the struct
                 out var listenerHandle);
-            
+
             if (result != Native.Iox2NativeMethods.IOX2_OK || listenerHandle == IntPtr.Zero)
                 return Result<Listener, Iox2Error>.Err(Iox2Error.ListenerCreationFailed);
-            
+
             var handle = new SafeListenerHandle(listenerHandle);
             var listener = new Listener(handle);
-            
+
             return Result<Listener, Iox2Error>.Ok(listener);
         }
         catch (Exception)

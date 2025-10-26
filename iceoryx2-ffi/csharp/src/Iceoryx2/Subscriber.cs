@@ -1,7 +1,7 @@
+using Iceoryx2.SafeHandles;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Iceoryx2.SafeHandles;
 
 namespace Iceoryx2;
 
@@ -24,22 +24,22 @@ public sealed class Subscriber : IDisposable
     public Result<Sample<T>?, Iox2Error> Receive<T>() where T : unmanaged
     {
         ThrowIfDisposed();
-        
+
         try
         {
             // Receive sample - pass by reference for subscriber handle
             var subscriberHandle = _handle.DangerousGetHandle();
-            
+
             // Debug: Iox2Log the handle value
             Console.WriteLine($"[DEBUG] Calling receive with handle: {subscriberHandle}");
-            
+
             var result = Native.Iox2NativeMethods.iox2_subscriber_receive(
                 ref subscriberHandle,  // Pass by reference - C expects pointer to handle
                 IntPtr.Zero,  // NULL - let C allocate the struct
                 out var sampleHandle);
-            
+
             Console.WriteLine($"[DEBUG] Receive returned: result={result}, sampleHandle={sampleHandle}");
-            
+
             // No sample available is not an error
             if (result != Native.Iox2NativeMethods.IOX2_OK)
             {
@@ -47,13 +47,13 @@ public sealed class Subscriber : IDisposable
                     return Result<Sample<T>?, Iox2Error>.Ok(null);
                 return Result<Sample<T>?, Iox2Error>.Err(Iox2Error.ReceiveFailed);
             }
-            
+
             if (sampleHandle == IntPtr.Zero)
                 return Result<Sample<T>?, Iox2Error>.Ok(null);
-            
+
             var handle = new SafeSampleHandle(sampleHandle, isMutable: false);
             var sample = new Sample<T>(handle);
-            
+
             return Result<Sample<T>?, Iox2Error>.Ok(sample);
         }
         catch (Exception)
@@ -73,7 +73,7 @@ public sealed class Subscriber : IDisposable
         ThrowIfDisposed();
 
         var stopwatch = System.Diagnostics.Stopwatch.StartNew();
-        
+
         while (stopwatch.Elapsed < timeout)
         {
             cancellationToken.ThrowIfCancellationRequested();

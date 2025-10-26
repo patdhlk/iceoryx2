@@ -1,7 +1,7 @@
-using System;
-using Xunit;
 using Iceoryx2;
 using Iceoryx2.Native;
+using System;
+using Xunit;
 
 namespace Iceoryx2.Tests
 {
@@ -32,7 +32,7 @@ namespace Iceoryx2.Tests
             // Test that we can create a NodeBuilder with proper struct
             var builderStruct = new Iox2NativeMethods.iox2_node_builder_t();
             var builderHandle = Iox2NativeMethods.iox2_node_builder_new(ref builderStruct);
-            
+
             Assert.NotEqual(IntPtr.Zero, builderHandle);
         }
 
@@ -46,7 +46,7 @@ namespace Iceoryx2.Tests
 
             // Build the node - pass IntPtr.Zero to let C allocate on heap
             var result = Iox2NativeMethods.iox2_node_builder_create(
-                builderHandle, 
+                builderHandle,
                 IntPtr.Zero,  // NULL - let C allocate the struct
                 Iox2NativeMethods.iox2_service_type_e.IPC,
                 out IntPtr nodeHandle);
@@ -68,9 +68,9 @@ namespace Iceoryx2.Tests
             // First create a node
             var builderStruct = new Iox2NativeMethods.iox2_node_builder_t();
             var nodeBuilderHandle = Iox2NativeMethods.iox2_node_builder_new(ref builderStruct);
-            
+
             var result = Iox2NativeMethods.iox2_node_builder_create(
-                nodeBuilderHandle, 
+                nodeBuilderHandle,
                 IntPtr.Zero,  // NULL - let C allocate the struct
                 Iox2NativeMethods.iox2_service_type_e.IPC,
                 out IntPtr nodeHandle);
@@ -80,7 +80,7 @@ namespace Iceoryx2.Tests
 
             // Now try to get a service builder from the node
             // Note: This needs proper struct allocation too, but for now test the node works
-            
+
             // Clean up
             Iox2NativeMethods.iox2_node_drop(nodeHandle);
         }
@@ -90,7 +90,7 @@ namespace Iceoryx2.Tests
         {
             // This test verifies the library name logic without calling native code
             string expectedName;
-            
+
             if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(
                 System.Runtime.InteropServices.OSPlatform.Windows))
             {

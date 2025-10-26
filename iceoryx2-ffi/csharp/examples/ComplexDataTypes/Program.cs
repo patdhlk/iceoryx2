@@ -1,6 +1,6 @@
+using Iceoryx2;
 using System;
 using System.Runtime.InteropServices;
-using Iceoryx2;
 
 namespace ComplexDataTypesExample;
 
@@ -193,7 +193,7 @@ class Program
             T data = typeof(T).Name switch
             {
                 nameof(TransmissionData) => System.Runtime.CompilerServices.Unsafe.As<TransmissionData, T>(ref System.Runtime.CompilerServices.Unsafe.AsRef(in transmissionData)),
-            
+
                 nameof(SensorData) => System.Runtime.CompilerServices.Unsafe.As<SensorData, T>(ref System.Runtime.CompilerServices.Unsafe.AsRef(in sensorData)),
                 nameof(Point3D) => System.Runtime.CompilerServices.Unsafe.As<Point3D, T>(ref System.Runtime.CompilerServices.Unsafe.AsRef(in point3D)),
                 _ => throw new InvalidOperationException($"Unknown type: {typeof(T).Name}")

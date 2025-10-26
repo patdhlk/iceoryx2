@@ -23,7 +23,7 @@ public class NodeTests
     public void CanCreateNode()
     {
         var result = NodeBuilder.New().Create();
-        
+
         Assert.True(result.IsOk);
         using var node = result.Unwrap();
         Assert.NotNull(node);
@@ -33,7 +33,7 @@ public class NodeTests
     public void NodeHasName()
     {
         var result = NodeBuilder.New().Create();
-        
+
         Assert.True(result.IsOk);
         using var node = result.Unwrap();
         // Note: Name property currently returns placeholder "node"

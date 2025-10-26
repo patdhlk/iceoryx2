@@ -1,6 +1,6 @@
+using Iceoryx2;
 using System;
 using System.Threading;
-using Iceoryx2;
 
 namespace PublishSubscribeExample;
 

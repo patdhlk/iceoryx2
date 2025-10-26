@@ -50,7 +50,7 @@ public static class SubscriberExtensions
             throw new ArgumentNullException(nameof(subscriber));
 
         var interval = pollingInterval ?? TimeSpan.FromMilliseconds(10);
-        
+
         return new SubscriberObservable<T>(subscriber, interval, cancellationToken);
     }
 
@@ -84,7 +84,7 @@ public static class SubscriberExtensions
         while (!cancellationToken.IsCancellationRequested)
         {
             var result = subscriber.Receive<T>();
-            
+
             if (result.IsOk)
             {
                 var sample = result.Unwrap();

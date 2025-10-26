@@ -10,8 +10,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
-using System;
 using Iceoryx2.SafeHandles;
+using System;
 
 namespace Iceoryx2;
 
@@ -43,9 +43,9 @@ public sealed class WaitSetAttachmentId : IDisposable, IEquatable<WaitSetAttachm
 
         var attachmentHandle = _handle.DangerousGetHandle();
         var guardHandle = guard.GetHandle();
-        
+
         return Native.Iox2NativeMethods.iox2_waitset_attachment_id_has_event_from(
-            ref attachmentHandle, 
+            ref attachmentHandle,
             ref guardHandle);
     }
 
@@ -63,7 +63,7 @@ public sealed class WaitSetAttachmentId : IDisposable, IEquatable<WaitSetAttachm
 
         var attachmentHandle = _handle.DangerousGetHandle();
         var guardHandle = guard.GetHandle();
-        
+
         return Native.Iox2NativeMethods.iox2_waitset_attachment_id_has_missed_deadline(
             ref attachmentHandle,
             ref guardHandle);

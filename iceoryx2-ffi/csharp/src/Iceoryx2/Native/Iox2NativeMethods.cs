@@ -32,7 +32,7 @@ internal static partial class Iox2NativeMethods
     // ========================================
     // Cross-Platform Library Loading
     // ========================================
-    
+
     static Iox2NativeMethods()
     {
         NativeLibrary.SetDllImportResolver(typeof(Iox2NativeMethods).Assembly, DllImportResolver);
@@ -64,7 +64,7 @@ internal static partial class Iox2NativeMethods
     // ========================================
     // Constants
     // ========================================
-    
+
     internal const int IOX2_OK = 0;
     internal const int IOX2_NODE_NAME_LENGTH = 128;
     internal const int IOX2_SERVICE_NAME_LENGTH = 255;
@@ -72,13 +72,13 @@ internal static partial class Iox2NativeMethods
     // ========================================
     // Enums
     // ========================================
-    
+
     internal enum iox2_service_type_e
     {
         LOCAL = 0,  // Must match C enum: LOCAL comes first
         IPC = 1     // Must match C enum: IPC comes second
     }
-    
+
     internal enum iox2_log_level_e
     {
         TRACE = 0,
@@ -88,7 +88,7 @@ internal static partial class Iox2NativeMethods
         ERROR = 4,
         FATAL = 5
     }
-    
+
     internal enum iox2_type_variant_e
     {
         FIXED_SIZE = 0,
@@ -1202,4 +1202,3 @@ internal static partial class Iox2NativeMethods
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
     internal static extern IntPtr iox2_listener_get_file_descriptor(ref IntPtr listener_handle);
 }
-

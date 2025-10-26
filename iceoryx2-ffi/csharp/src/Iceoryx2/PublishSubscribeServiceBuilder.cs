@@ -1,5 +1,5 @@
-using System;
 using Iceoryx2.SafeHandles;
+using System;
 
 namespace Iceoryx2;
 
@@ -22,18 +22,18 @@ public sealed class PublishSubscribeServiceBuilder<T> where T : unmanaged
     public Result<Service, Iox2Error> Open(string serviceName)
     {
         _serviceName = serviceName ?? throw new ArgumentNullException(nameof(serviceName));
-        
+
         try
         {
             // Create service name
             var serviceNameBytes = System.Text.Encoding.UTF8.GetByteCount(_serviceName);
-            
+
             var result = Native.Iox2NativeMethods.iox2_service_name_new(
                 IntPtr.Zero,  // pass IntPtr.Zero to use default storage allocation
                 _serviceName,
                 serviceNameBytes,
                 out var serviceNameHandle);
-            
+
             if (result != Native.Iox2NativeMethods.IOX2_OK)
                 return Result<Service, Iox2Error>.Err(Iox2Error.ServiceCreationFailed);
 
@@ -83,7 +83,7 @@ public sealed class PublishSubscribeServiceBuilder<T> where T : unmanaged
                         typeAlignment = (ulong)IntPtr.Size;
                     }
                 }
-                
+
                 Console.WriteLine($"[DEBUG] Setting payload type details: name='{typeName}', name_bytes={System.Text.Encoding.UTF8.GetByteCount(typeName)}, size={typeSize}, alignment={typeAlignment}");
                 var typeResult = Native.Iox2NativeMethods.iox2_service_builder_pub_sub_set_payload_type_details(
                     ref pubSubBuilderHandle,  // Pass by reference - C expects pointer to handle
@@ -119,7 +119,7 @@ public sealed class PublishSubscribeServiceBuilder<T> where T : unmanaged
 
             var handle = new SafeServiceHandle(portFactoryHandle);
             var service = new Service(handle);
-            
+
             return Result<Service, Iox2Error>.Ok(service);
         }
         catch (Exception)

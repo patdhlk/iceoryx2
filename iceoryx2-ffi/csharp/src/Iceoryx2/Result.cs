@@ -67,7 +67,7 @@ public readonly struct Result<T, E>
     {
         if (_isOk)
             return _value!;
-        
+
         throw new InvalidOperationException($"{message}: {_error}");
     }
 
@@ -78,7 +78,7 @@ public readonly struct Result<T, E>
     {
         if (_isOk)
             return _value!;
-        
+
         throw new InvalidOperationException($"Called Unwrap on an error result: {_error}");
     }
 

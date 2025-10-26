@@ -1,8 +1,8 @@
+using Iceoryx2;
+using Iceoryx2.RequestResponse;
 using System;
 using System.Runtime.InteropServices;
 using System.Threading;
-using Iceoryx2;
-using Iceoryx2.RequestResponse;
 
 namespace RequestResponseExample;
 
@@ -104,9 +104,9 @@ class Program
             {
                 // Give server time to process
                 Thread.Sleep(100);
-                
+
                 Console.WriteLine("DEBUG: Checking for responses...");
-                
+
                 // Check for responses
                 while (true)
                 {
