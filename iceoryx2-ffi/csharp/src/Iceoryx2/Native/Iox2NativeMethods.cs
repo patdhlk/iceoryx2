@@ -10,10 +10,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
-// NOTE: This file is auto-generated. Do not modify manually!
-// Regenerate with: cd generator && dotnet run
-
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -26,6 +24,7 @@ namespace Iceoryx2.Native;
 /// Native P/Invoke methods for iceoryx2 C FFI.
 /// Supports Linux, macOS, and Windows through dynamic library resolution.
 /// </summary>
+[SuppressMessage("ReSharper", "InconsistentNaming")]
 internal static partial class Iox2NativeMethods
 {
     private const string LibraryName = "iceoryx2_ffi_c";
@@ -1000,4 +999,207 @@ internal static partial class Iox2NativeMethods
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
     [return: MarshalAs(UnmanagedType.U1)]
     internal static extern bool iox2_set_logger(iox2_log_callback logger);
+
+    // ========================================
+    // WaitSet API - Enums and Delegates
+    // ========================================
+
+    internal enum iox2_signal_handling_mode_e
+    {
+        DISABLED = 0,
+        TERMINATION = 1,
+        INTERRUPT = 2,
+        TERMINATION_AND_INTERRUPT = 3
+    }
+
+    internal enum iox2_callback_progression_e
+    {
+        STOP = 0,
+        CONTINUE = 1
+    }
+
+    internal enum iox2_waitset_run_result_e
+    {
+        TERMINATION_REQUEST = IOX2_OK + 1,
+        INTERRUPT = IOX2_OK + 2,
+        STOP_REQUEST = IOX2_OK + 3,
+        ALL_EVENTS_HANDLED = IOX2_OK + 4
+    }
+
+    internal enum iox2_waitset_run_error_e
+    {
+        INSUFFICIENT_PERMISSIONS = IOX2_OK + 1,
+        INTERNAL_ERROR = IOX2_OK + 2,
+        NO_ATTACHMENTS = IOX2_OK + 3,
+        TERMINATION_REQUEST = IOX2_OK + 4,
+        INTERRUPT = IOX2_OK + 5
+    }
+
+    internal enum iox2_waitset_attachment_error_e
+    {
+        INSUFFICIENT_CAPACITY = IOX2_OK + 1,
+        ALREADY_ATTACHED = IOX2_OK + 2,
+        INTERNAL_ERROR = IOX2_OK + 3,
+        INSUFFICIENT_RESOURCES = IOX2_OK + 4
+    }
+
+    internal enum iox2_waitset_create_error_e
+    {
+        INTERNAL_ERROR = IOX2_OK + 1,
+        INSUFFICIENT_RESOURCES = IOX2_OK + 2
+    }
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    internal delegate iox2_callback_progression_e iox2_waitset_run_callback(
+        IntPtr attachment_id_handle,
+        IntPtr callback_context);
+
+    // ========================================
+    // WaitSetBuilder API
+    // ========================================
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern void iox2_waitset_builder_new(
+        IntPtr struct_ptr,
+        out IntPtr handle_ptr);
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern void iox2_waitset_builder_drop(IntPtr handle);
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern int iox2_waitset_builder_create(
+        IntPtr builder_handle,
+        iox2_service_type_e service_type,
+        IntPtr struct_ptr,
+        out IntPtr waitset_handle);
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern void iox2_waitset_builder_set_signal_handling_mode(
+        ref IntPtr builder_handle_ref,
+        iox2_signal_handling_mode_e mode);
+
+    // ========================================
+    // WaitSet API
+    // ========================================
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern void iox2_waitset_drop(IntPtr handle);
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    internal static extern bool iox2_waitset_is_empty(ref IntPtr handle);
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern UIntPtr iox2_waitset_len(ref IntPtr handle);
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern UIntPtr iox2_waitset_capacity(ref IntPtr handle);
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern iox2_signal_handling_mode_e iox2_waitset_signal_handling_mode(ref IntPtr handle);
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern int iox2_waitset_attach_notification(
+        ref IntPtr waitset_handle,
+        IntPtr file_descriptor,
+        IntPtr guard_struct_ptr,
+        out IntPtr guard_handle);
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern int iox2_waitset_attach_deadline(
+        ref IntPtr waitset_handle,
+        IntPtr file_descriptor,
+        ulong seconds,
+        uint nanoseconds,
+        IntPtr guard_struct_ptr,
+        out IntPtr guard_handle);
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern int iox2_waitset_attach_interval(
+        ref IntPtr waitset_handle,
+        ulong seconds,
+        uint nanoseconds,
+        IntPtr guard_struct_ptr,
+        out IntPtr guard_handle);
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern int iox2_waitset_wait_and_process(
+        ref IntPtr waitset_handle,
+        iox2_waitset_run_callback callback,
+        IntPtr callback_context,
+        out iox2_waitset_run_result_e result);
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern int iox2_waitset_wait_and_process_once(
+        ref IntPtr waitset_handle,
+        iox2_waitset_run_callback callback,
+        IntPtr callback_context,
+        out iox2_waitset_run_result_e result);
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern int iox2_waitset_wait_and_process_once_with_timeout(
+        ref IntPtr waitset_handle,
+        iox2_waitset_run_callback callback,
+        IntPtr callback_context,
+        ulong seconds,
+        uint nanoseconds,
+        out iox2_waitset_run_result_e result);
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern void iox2_waitset_stop(ref IntPtr waitset_handle);
+
+    // ========================================
+    // WaitSetGuard API
+    // ========================================
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern void iox2_waitset_guard_drop(IntPtr handle);
+
+    // ========================================
+    // WaitSetAttachmentId API
+    // ========================================
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern void iox2_waitset_attachment_id_drop(IntPtr handle);
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    internal static extern bool iox2_waitset_attachment_id_equal(
+        ref IntPtr lhs,
+        ref IntPtr rhs);
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    internal static extern bool iox2_waitset_attachment_id_less(
+        ref IntPtr lhs,
+        ref IntPtr rhs);
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    internal static extern bool iox2_waitset_attachment_id_has_event_from(
+        ref IntPtr attachment_id_handle,
+        ref IntPtr guard_handle);
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    internal static extern bool iox2_waitset_attachment_id_has_missed_deadline(
+        ref IntPtr attachment_id_handle,
+        ref IntPtr guard_handle);
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern IntPtr iox2_waitset_create_error_string(iox2_waitset_create_error_e error);
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern IntPtr iox2_waitset_attachment_error_string(iox2_waitset_attachment_error_e error);
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern IntPtr iox2_waitset_run_error_string(iox2_waitset_run_error_e error);
+
+    // ========================================
+    // FileDescriptor API (needed for WaitSet attachments)
+    // ========================================
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern IntPtr iox2_listener_get_file_descriptor(ref IntPtr listener_handle);
 }
+

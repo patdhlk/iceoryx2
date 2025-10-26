@@ -154,6 +154,27 @@ public enum Iox2Error
     InvalidHandle,
 
     /// <summary>
+    /// Indicates a failure during the creation of a WaitSet.
+    /// This error may occur when the system cannot allocate the required resources
+    /// or establish the WaitSet for event multiplexing.
+    /// </summary>
+    WaitSetCreationFailed,
+
+    /// <summary>
+    /// Indicates a failure when attaching to a WaitSet.
+    /// This error may occur due to insufficient capacity, the object already being attached,
+    /// or internal system errors.
+    /// </summary>
+    WaitSetAttachmentFailed,
+
+    /// <summary>
+    /// Indicates a failure during WaitSet wait and process operation.
+    /// This error may occur due to insufficient permissions, no attachments,
+    /// or internal system errors.
+    /// </summary>
+    WaitSetRunFailed,
+
+    /// <summary>
     /// Represents an unspecified or unclassified error. This value may be used
     /// as a placeholder when the exact nature of the error is unknown or does not
     /// match predefined error cases within the Iox2Error enumeration.

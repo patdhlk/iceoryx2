@@ -183,6 +183,15 @@ public sealed class Listener : IDisposable
     }
 
     /// <summary>
+    /// Gets the internal handle (for internal use by WaitSet).
+    /// </summary>
+    internal IntPtr GetHandle()
+    {
+        ThrowIfDisposed();
+        return _handle.DangerousGetHandle();
+    }
+
+    /// <summary>
     /// Disposes of the resources used by the Listener instance.
     /// </summary>
     public void Dispose()
