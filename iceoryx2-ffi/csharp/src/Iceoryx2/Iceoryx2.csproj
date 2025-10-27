@@ -51,6 +51,8 @@
 
   <ItemGroup>
     <PackageReference Include="System.Memory" Version="4.5.5" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.0" />
   </ItemGroup>
 
   <!-- Copy native library to output directory of any project referencing this library -->

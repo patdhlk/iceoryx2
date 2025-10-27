@@ -33,6 +33,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReactiveExample", "examples
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReactiveEventExample", "examples\ReactiveEventExample\ReactiveEventExample.csproj", "{D7A9FC8F-E6C8-48BD-8F76-23FFE92A5E97}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoggingIntegration", "examples\LoggingIntegration\LoggingIntegration.csproj", "{E18D3E1E-7824-4346-9A03-C3A7C50E48E7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -199,6 +201,18 @@ Global
 		{D7A9FC8F-E6C8-48BD-8F76-23FFE92A5E97}.Release|x64.Build.0 = Release|Any CPU
 		{D7A9FC8F-E6C8-48BD-8F76-23FFE92A5E97}.Release|x86.ActiveCfg = Release|Any CPU
 		{D7A9FC8F-E6C8-48BD-8F76-23FFE92A5E97}.Release|x86.Build.0 = Release|Any CPU
+		{E18D3E1E-7824-4346-9A03-C3A7C50E48E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E18D3E1E-7824-4346-9A03-C3A7C50E48E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E18D3E1E-7824-4346-9A03-C3A7C50E48E7}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E18D3E1E-7824-4346-9A03-C3A7C50E48E7}.Debug|x64.Build.0 = Debug|Any CPU
+		{E18D3E1E-7824-4346-9A03-C3A7C50E48E7}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E18D3E1E-7824-4346-9A03-C3A7C50E48E7}.Debug|x86.Build.0 = Debug|Any CPU
+		{E18D3E1E-7824-4346-9A03-C3A7C50E48E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E18D3E1E-7824-4346-9A03-C3A7C50E48E7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E18D3E1E-7824-4346-9A03-C3A7C50E48E7}.Release|x64.ActiveCfg = Release|Any CPU
+		{E18D3E1E-7824-4346-9A03-C3A7C50E48E7}.Release|x64.Build.0 = Release|Any CPU
+		{E18D3E1E-7824-4346-9A03-C3A7C50E48E7}.Release|x86.ActiveCfg = Release|Any CPU
+		{E18D3E1E-7824-4346-9A03-C3A7C50E48E7}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -215,5 +229,6 @@ Global
 		{9C2940D3-7D90-4E84-9EAF-4175F96DDE14} = {BC3A1E43-FC68-4656-A0AC-705B63F41D3C}
 		{4FBA60AF-B651-418F-B6E5-6981AC7F4723} = {BC3A1E43-FC68-4656-A0AC-705B63F41D3C}
 		{C9E9C880-E09E-4D1A-9E6D-F05849446CEC} = {BC3A1E43-FC68-4656-A0AC-705B63F41D3C}
+		{E18D3E1E-7824-4346-9A03-C3A7C50E48E7} = {BC3A1E43-FC68-4656-A0AC-705B63F41D3C}
 	EndGlobalSection
 EndGlobal
