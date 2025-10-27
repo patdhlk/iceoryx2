@@ -35,14 +35,6 @@
   <!-- Package native libraries for different platforms -->
   <ItemGroup>
     <!-- macOS (osx-x64 and osx-arm64) -->
-    <None Include="../../../../target/release/libiceoryx2_ffi_c.dylib" 
-          Pack="true" 
-          PackagePath="runtimes/osx-x64/native/libiceoryx2_ffi_c.dylib"
-          Condition="Exists('../../../../target/release/libiceoryx2_ffi_c.dylib')" />
-    <None Include="../../../../target/release/libiceoryx2_ffi_c.dylib" 
-          Pack="true" 
-          PackagePath="runtimes/osx-arm64/native/libiceoryx2_ffi_c.dylib"
-          Condition="Exists('../../../../target/release/libiceoryx2_ffi_c.dylib')" />
     
     <!-- Linux x64 -->
     <None Include="../../../../target/release/libiceoryx2_ffi_c.so" 
