@@ -15,7 +15,7 @@
 using Microsoft.Extensions.Logging;
 using System;
 
-namespace Iceoryx2.Extensions.Logging;
+namespace Iceoryx2.Extensions;
 
 /// <summary>
 /// Integrates iceoryx2 native logging with Microsoft.Extensions.Logging infrastructure.

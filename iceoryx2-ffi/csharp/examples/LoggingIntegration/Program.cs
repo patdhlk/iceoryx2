@@ -11,7 +11,7 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
 using Iceoryx2;
-using Iceoryx2.Extensions.Logging;
+using Iceoryx2.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;

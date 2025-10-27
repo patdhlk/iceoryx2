@@ -16,7 +16,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 
-namespace Iceoryx2.Extensions.Logging;
+namespace Iceoryx2.Extensions;
 
 /// <summary>
 /// Extension methods for configuring iceoryx2 logging with dependency injection.

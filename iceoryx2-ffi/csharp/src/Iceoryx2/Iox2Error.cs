@@ -1,183 +1,94 @@
+using Iceoryx2.ErrorHandling;
+
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+
 namespace Iceoryx2;
 
 /// <summary>
-/// Indicates that a loan for a sample could not be obtained during the operation.
-/// This error may occur when the underlying memory management system for samples fails
-/// to grant the requested loan, such as due to insufficient memory resources.
+/// Base class for all iceoryx2 errors. Provides rich, contextual error information
+/// that enables better diagnostics and troubleshooting.
 /// </summary>
-public enum Iox2Error
+public abstract class Iox2Error
 {
     /// <summary>
-    /// Represents an unknown or undefined error condition. This value may be used
-    /// when the specific error type cannot be determined or mapped to existing
-    /// defined errors.
+    /// Gets the error message describing what went wrong.
     /// </summary>
-    NodeCreationFailed,
+    public abstract string Message { get; }
 
     /// <summary>
-    /// Indicates that the creation of a service failed. This error is typically encountered
-    /// when the necessary resources or configurations required to establish the service
-    /// cannot be fulfilled or initialized during the service creation process.
+    /// Gets the error kind for pattern matching and backward compatibility.
     /// </summary>
-    ServiceCreationFailed,
+    public abstract Iox2ErrorKind Kind { get; }
 
     /// <summary>
-    /// Indicates a failure during the creation of a publisher.
+    /// Gets additional details about the error, if available.
     /// </summary>
-    PublisherCreationFailed,
+    public virtual string? Details { get; }
 
     /// <summary>
-    /// Represents an error that occurs when the creation of a subscriber fails.
-    /// This error may arise due to issues such as resource constraints, invalid
-    /// configurations, or system-level failures during the subscriber creation process.
+    /// Returns a string representation of the error.
     /// </summary>
-    SubscriberCreationFailed,
+    public override string ToString() => Message;
 
     /// <summary>
-    /// Indicates that a loan for a sample could not be obtained during the operation.
-    /// This error might occur when the system is unable to allocate the required resources
-    /// to fulfill the sample loan request, often due to insufficient memory availability
-    /// or conflicting resource constraints.
+    /// Creates an Iox2Error from an error kind with optional details.
     /// </summary>
-    SampleLoanFailed,
-
-    /// <summary>
-    /// Represents an error condition where the send operation failed.
-    /// This error may occur if the data cannot be transmitted successfully due to
-    /// issues like communication breakdown, insufficient resources, or invalid state.
-    /// </summary>
-    SendFailed,
-
-    /// <summary>
-    /// Represents an error condition where receiving data has failed.
-    /// This may occur if the subscriber is unable to successfully retrieve
-    /// the expected data, which could be due to internal errors or data unavailability.
-    /// </summary>
-    ReceiveFailed,
-
-    /// <summary>
-    /// Indicates a failure during the creation of a notifier.
-    /// This error may occur when the system cannot allocate the required resources
-    /// or establish the notifier for event-based communication.
-    /// </summary>
-    NotifierCreationFailed,
-
-    /// <summary>
-    /// Indicates a failure during the creation of a listener.
-    /// This error may occur when the system cannot allocate the required resources
-    /// or establish the listener for event-based communication.
-    /// </summary>
-    ListenerCreationFailed,
-
-    /// <summary>
-    /// Represents an error condition where the notify operation failed.
-    /// This error may occur if the event notification cannot be sent to listeners
-    /// due to issues like communication breakdown or invalid event ID.
-    /// </summary>
-    NotifyFailed,
-
-    /// <summary>
-    /// Represents an error condition where waiting for an event failed.
-    /// This error may occur if the listener encounters an issue while waiting
-    /// for event notifications, such as timeout or internal failure.
-    /// </summary>
-    WaitFailed,
-
-    /// <summary>
-    /// Indicates a failure during the creation of an event service.
-    /// This error is encountered when the necessary resources or configurations
-    /// required to establish the event service cannot be fulfilled.
-    /// </summary>
-    EventServiceCreationFailed,
-
-    /// <summary>
-    /// Indicates a failure during the creation of a request-response service.
-    /// This error is encountered when the necessary resources or configurations
-    /// required to establish the request-response service cannot be fulfilled.
-    /// </summary>
-    RequestResponseServiceCreationFailed,
-
-    /// <summary>
-    /// Indicates a failure during the creation of a client.
-    /// This error may occur when the system cannot allocate the required resources
-    /// or establish the client for request-response communication.
-    /// </summary>
-    ClientCreationFailed,
-
-    /// <summary>
-    /// Indicates a failure during the creation of a server.
-    /// This error may occur when the system cannot allocate the required resources
-    /// or establish the server for request-response communication.
-    /// </summary>
-    ServerCreationFailed,
-
-    /// <summary>
-    /// Represents an error condition where loaning a request failed.
-    /// This error may occur if the client cannot allocate memory for the request
-    /// due to resource constraints or invalid state.
-    /// </summary>
-    RequestLoanFailed,
-
-    /// <summary>
-    /// Represents an error condition where sending a request failed.
-    /// This error may occur if the request cannot be transmitted to the server
-    /// due to communication breakdown or resource issues.
-    /// </summary>
-    RequestSendFailed,
-
-    /// <summary>
-    /// Represents an error condition where loaning a response failed.
-    /// This error may occur if the server cannot allocate memory for the response
-    /// due to resource constraints or invalid state.
-    /// </summary>
-    ResponseLoanFailed,
-
-    /// <summary>
-    /// Represents an error condition where sending a response failed.
-    /// This error may occur if the response cannot be transmitted back to the client
-    /// due to communication breakdown or resource issues.
-    /// </summary>
-    ResponseSendFailed,
-
-    /// <summary>
-    /// Represents an error condition where receiving a response failed.
-    /// This error may occur if the client cannot successfully retrieve the response
-    /// from the server due to timeout or communication issues.
-    /// </summary>
-    ResponseReceiveFailed,
-
-    /// <summary>
-    /// Indicates that an operation failed due to an invalid handle being used.
-    /// This error typically occurs when a handle provided to the system is
-    /// unrecognized, uninitialized, or no longer valid.
-    /// </summary>
-    InvalidHandle,
-
-    /// <summary>
-    /// Indicates a failure during the creation of a WaitSet.
-    /// This error may occur when the system cannot allocate the required resources
-    /// or establish the WaitSet for event multiplexing.
-    /// </summary>
-    WaitSetCreationFailed,
-
-    /// <summary>
-    /// Indicates a failure when attaching to a WaitSet.
-    /// This error may occur due to insufficient capacity, the object already being attached,
-    /// or internal system errors.
-    /// </summary>
-    WaitSetAttachmentFailed,
-
-    /// <summary>
-    /// Indicates a failure during WaitSet wait and process operation.
-    /// This error may occur due to insufficient permissions, no attachments,
-    /// or internal system errors.
-    /// </summary>
-    WaitSetRunFailed,
-
-    /// <summary>
-    /// Represents an unspecified or unclassified error. This value may be used
-    /// as a placeholder when the exact nature of the error is unknown or does not
-    /// match predefined error cases within the Iox2Error enumeration.
-    /// </summary>
-    Unknown
+    public static Iox2Error FromKind(Iox2ErrorKind kind, string? details = null)
+    {
+        return kind switch
+        {
+            Iox2ErrorKind.NodeCreationFailed => new NodeCreationError(details),
+            Iox2ErrorKind.ServiceCreationFailed => new ServiceCreationError(null, details),
+            Iox2ErrorKind.PublisherCreationFailed => new PublisherCreationError(details),
+            Iox2ErrorKind.SubscriberCreationFailed => new SubscriberCreationError(details),
+            Iox2ErrorKind.SampleLoanFailed => new SampleLoanError(details),
+            Iox2ErrorKind.SendFailed => new SendError(details),
+            Iox2ErrorKind.ReceiveFailed => new ReceiveError(details),
+            Iox2ErrorKind.NotifierCreationFailed => new NotifierCreationError(details),
+            Iox2ErrorKind.ListenerCreationFailed => new ListenerCreationError(details),
+            Iox2ErrorKind.NotifyFailed => new NotifyError(null, details),
+            Iox2ErrorKind.WaitFailed => new WaitError(details),
+            Iox2ErrorKind.EventServiceCreationFailed => new EventServiceCreationError(null, details),
+            Iox2ErrorKind.RequestResponseServiceCreationFailed => new RequestResponseServiceCreationError(null, details),
+            Iox2ErrorKind.ClientCreationFailed => new ClientCreationError(details),
+            Iox2ErrorKind.ServerCreationFailed => new ServerCreationError(details),
+            Iox2ErrorKind.RequestLoanFailed => new RequestLoanError(details),
+            Iox2ErrorKind.RequestSendFailed => new RequestSendError(details),
+            Iox2ErrorKind.ResponseLoanFailed => new ResponseLoanError(details),
+            Iox2ErrorKind.ResponseSendFailed => new ResponseSendError(details),
+            Iox2ErrorKind.ResponseReceiveFailed => new ResponseReceiveError(details),
+            Iox2ErrorKind.InvalidHandle => new InvalidHandleError(details),
+            Iox2ErrorKind.WaitSetCreationFailed => new WaitSetCreationError(details),
+            Iox2ErrorKind.WaitSetAttachmentFailed => new WaitSetAttachmentError(details),
+            Iox2ErrorKind.WaitSetRunFailed => new WaitSetRunError(details),
+            Iox2ErrorKind.Unknown => new UnknownError(details),
+            _ => new UnknownError(details)
+        };
+    }
+    
+    public static Iox2Error NodeCreationFailed => new NodeCreationError();
+    public static Iox2Error ServiceCreationFailed => new ServiceCreationError(null);
+    public static Iox2Error PublisherCreationFailed => new PublisherCreationError();
+    public static Iox2Error SubscriberCreationFailed => new SubscriberCreationError();
+    public static Iox2Error SampleLoanFailed => new SampleLoanError();
+    public static Iox2Error SendFailed => new SendError();
+    public static Iox2Error ReceiveFailed => new ReceiveError();
+    public static Iox2Error NotifierCreationFailed => new NotifierCreationError();
+    public static Iox2Error ListenerCreationFailed => new ListenerCreationError();
+    public static Iox2Error NotifyFailed => new NotifyError();
+    public static Iox2Error WaitFailed => new WaitError();
+    public static Iox2Error EventServiceCreationFailed => new EventServiceCreationError(null);
+    public static Iox2Error RequestResponseServiceCreationFailed => new RequestResponseServiceCreationError(null);
+    public static Iox2Error ClientCreationFailed => new ClientCreationError();
+    public static Iox2Error ServerCreationFailed => new ServerCreationError();
+    public static Iox2Error RequestLoanFailed => new RequestLoanError();
+    public static Iox2Error RequestSendFailed => new RequestSendError();
+    public static Iox2Error ResponseLoanFailed => new ResponseLoanError();
+    public static Iox2Error ResponseSendFailed => new ResponseSendError();
+    public static Iox2Error ResponseReceiveFailed => new ResponseReceiveError();
+    public static Iox2Error InvalidHandle => new InvalidHandleError();
+    public static Iox2Error WaitSetCreationFailed => new WaitSetCreationError();
+    public static Iox2Error WaitSetAttachmentFailed => new WaitSetAttachmentError();
+    public static Iox2Error WaitSetRunFailed => new WaitSetRunError();
+    public static Iox2Error Unknown => new UnknownError();
 }
