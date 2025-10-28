@@ -49,8 +49,6 @@ public sealed class Sample<T> : IDisposable where T : unmanaged
                 out var payloadPtr,
                 out var payloadLen);
 
-            Console.WriteLine($"[DEBUG] Payload.get: sampleHandle={sampleHandle}, payloadPtr={payloadPtr}, payloadLen={payloadLen}");
-
             if (payloadPtr == IntPtr.Zero)
                 throw new InvalidOperationException("Failed to get sample payload");
 
@@ -63,7 +61,6 @@ public sealed class Sample<T> : IDisposable where T : unmanaged
             DumpSampleMemory("Before payload write");
 
             var sampleHandle = _handle.DangerousGetHandle();
-            Console.WriteLine($"[DEBUG] About to call iox2_sample_mut_payload_mut with handle={sampleHandle}");
             IntPtr payloadPtr;
             unsafe
             {
@@ -74,9 +71,6 @@ public sealed class Sample<T> : IDisposable where T : unmanaged
                     out payloadPtr,
                     IntPtr.Zero);  // NULL - don't query element count due to native bug
             }
-            Console.WriteLine($"[DEBUG] Returned from iox2_sample_mut_payload_mut");
-
-            Console.WriteLine($"[DEBUG] Payload.set: sampleHandle={sampleHandle}, payloadPtr={payloadPtr}");
 
             if (payloadPtr == IntPtr.Zero)
                 throw new InvalidOperationException("Failed to get sample payload");
@@ -117,7 +111,6 @@ public sealed class Sample<T> : IDisposable where T : unmanaged
         try
         {
             var sampleHandle = _handle.DangerousGetHandle();
-            Console.WriteLine($"[DEBUG] About to send sample. handle={sampleHandle}");
 
             var result = Native.Iox2NativeMethods.iox2_sample_mut_send(
                 sampleHandle,

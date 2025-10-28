@@ -56,8 +56,6 @@ public sealed class Publisher : IDisposable
             if (result != Native.Iox2NativeMethods.IOX2_OK || sampleHandle == IntPtr.Zero)
                 return Result<Sample<T>, Iox2Error>.Err(Iox2Error.SampleLoanFailed);
 
-            Console.WriteLine($"[DEBUG] Loan returned: result={result}, sampleHandle={sampleHandle}");
-
             var handle = new SafeSampleHandle(sampleHandle, isMutable: true);
             var sample = new Sample<T>(handle);
 

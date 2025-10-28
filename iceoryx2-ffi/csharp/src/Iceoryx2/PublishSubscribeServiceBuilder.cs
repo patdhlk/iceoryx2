@@ -172,7 +172,6 @@ public sealed class PublishSubscribeServiceBuilder<T> where T : unmanaged
             // Set payload type details
             // Use Rust-compatible type names for cross-language interoperability
             var typeName = ServiceBuilder.GetRustCompatibleTypeName<T>();
-            Console.WriteLine($"[DEBUG] Opening service '{_serviceName}' with type name: '{typeName}'");
             unsafe
             {
                 var typeSize = (ulong)sizeof(T);
@@ -197,7 +196,6 @@ public sealed class PublishSubscribeServiceBuilder<T> where T : unmanaged
                     }
                 }
 
-                Console.WriteLine($"[DEBUG] Setting payload type details: name='{typeName}', name_bytes={System.Text.Encoding.UTF8.GetByteCount(typeName)}, size={typeSize}, alignment={typeAlignment}");
                 var typeResult = Native.Iox2NativeMethods.iox2_service_builder_pub_sub_set_payload_type_details(
                     ref pubSubBuilderHandle,  // Pass by reference - C expects pointer to handle
                     Native.Iox2NativeMethods.iox2_type_variant_e.FIXED_SIZE,
@@ -211,24 +209,16 @@ public sealed class PublishSubscribeServiceBuilder<T> where T : unmanaged
             }
 
             // Open or create the service - pass NULL to let C allocate on heap
-            Console.WriteLine($"[DEBUG] Calling open_or_create with builder handle: {pubSubBuilderHandle}");
-            Console.WriteLine($"[DEBUG] Builder handle as hex: 0x{pubSubBuilderHandle:X}");
             var openResult = Native.Iox2NativeMethods.iox2_service_builder_pub_sub_open_or_create(
                 pubSubBuilderHandle,
                 IntPtr.Zero,  // NULL - let C allocate the struct
                 out var portFactoryHandle);
 
-            Console.WriteLine($"[DEBUG] open_or_create result: {openResult} (0x{openResult:X}), port factory handle: {portFactoryHandle} (0x{portFactoryHandle:X})");
             if (openResult != Native.Iox2NativeMethods.IOX2_OK)
-            {
-                Console.WriteLine($"[ERROR] Service creation failed with error code: {openResult}");
                 return Result<Service, Iox2Error>.Err(Iox2Error.ServiceCreationFailed);
-            }
+
             if (portFactoryHandle == IntPtr.Zero)
-            {
-                Console.WriteLine($"[ERROR] Port factory handle is null despite OK result!");
                 return Result<Service, Iox2Error>.Err(Iox2Error.ServiceCreationFailed);
-            }
 
             var handle = new SafeServiceHandle(portFactoryHandle);
             var service = new Service(handle);

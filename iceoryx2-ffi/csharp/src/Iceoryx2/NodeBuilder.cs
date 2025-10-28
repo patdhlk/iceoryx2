@@ -61,14 +61,12 @@ public sealed class NodeBuilder
 
             // Create the node - pass IntPtr.Zero to let C FFI allocate the struct
             var serviceType = Native.Iox2NativeMethods.iox2_service_type_e.IPC;
-            Console.WriteLine($"[DEBUG] Creating node with service type: {serviceType} (value={(int)serviceType})");
             var createResult = Native.Iox2NativeMethods.iox2_node_builder_create(
                 builderHandle,
                 IntPtr.Zero,  // NULL - let C allocate the struct on heap
                 serviceType,
                 out var nodeHandle);
 
-            Console.WriteLine($"[DEBUG] Node created with result: {createResult}, handle: {nodeHandle}");
             if (createResult != Native.Iox2NativeMethods.IOX2_OK || nodeHandle == IntPtr.Zero)
                 return Result<Node, Iox2Error>.Err(Iox2Error.NodeCreationFailed);
 
@@ -77,10 +75,8 @@ public sealed class NodeBuilder
 
             return Result<Node, Iox2Error>.Ok(node);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            Console.WriteLine($"[ERROR] Exception during node creation: {ex.Message}");
-            Console.WriteLine($"[ERROR] Stack trace: {ex.StackTrace}");
             return Result<Node, Iox2Error>.Err(Iox2Error.NodeCreationFailed);
         }
     }
