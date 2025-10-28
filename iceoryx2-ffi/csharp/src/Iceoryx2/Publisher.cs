@@ -166,7 +166,7 @@ public sealed class Publisher : IDisposable
                 err => Result<Unit, Iox2Error>.Err(err));
 
         using var sample = loanResult.Unwrap();
-        
+
         // Read current payload, modify it, write it back
         var payload = sample.Payload;
         initializer(ref payload);

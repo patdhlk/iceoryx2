@@ -64,84 +64,84 @@ public abstract class Iox2Error
             _ => new UnknownError(details)
         };
     }
-    
+
     // Backward compatibility: Static error instances
-    
+
     /// <summary>Gets a <see cref="NodeCreationError"/> instance for backward compatibility.</summary>
     public static Iox2Error NodeCreationFailed => new NodeCreationError();
-    
+
     /// <summary>Gets a <see cref="ServiceCreationError"/> instance for backward compatibility.</summary>
     public static Iox2Error ServiceCreationFailed => new ServiceCreationError(null);
-    
+
     /// <summary>Gets a <see cref="PublisherCreationError"/> instance for backward compatibility.</summary>
     public static Iox2Error PublisherCreationFailed => new PublisherCreationError();
-    
+
     /// <summary>Gets a <see cref="SubscriberCreationError"/> instance for backward compatibility.</summary>
     public static Iox2Error SubscriberCreationFailed => new SubscriberCreationError();
-    
+
     /// <summary>Gets a <see cref="SampleLoanError"/> instance for backward compatibility.</summary>
     public static Iox2Error SampleLoanFailed => new SampleLoanError();
-    
+
     /// <summary>Gets a <see cref="SendError"/> instance for backward compatibility.</summary>
     public static Iox2Error SendFailed => new SendError();
-    
+
     /// <summary>Gets a <see cref="ReceiveError"/> instance for backward compatibility.</summary>
     public static Iox2Error ReceiveFailed => new ReceiveError();
-    
+
     /// <summary>Gets a <see cref="NotifierCreationError"/> instance for backward compatibility.</summary>
     public static Iox2Error NotifierCreationFailed => new NotifierCreationError();
-    
+
     /// <summary>Gets a <see cref="ListenerCreationError"/> instance for backward compatibility.</summary>
     public static Iox2Error ListenerCreationFailed => new ListenerCreationError();
-    
+
     /// <summary>Gets a <see cref="NotifyError"/> instance for backward compatibility.</summary>
     public static Iox2Error NotifyFailed => new NotifyError();
-    
+
     /// <summary>Gets a <see cref="WaitError"/> instance for backward compatibility.</summary>
     public static Iox2Error WaitFailed => new WaitError();
-    
+
     /// <summary>Gets an <see cref="EventServiceCreationError"/> instance for backward compatibility.</summary>
     public static Iox2Error EventServiceCreationFailed => new EventServiceCreationError(null);
-    
+
     /// <summary>Gets a <see cref="RequestResponseServiceCreationError"/> instance for backward compatibility.</summary>
     public static Iox2Error RequestResponseServiceCreationFailed => new RequestResponseServiceCreationError(null);
-    
+
     /// <summary>Gets a <see cref="ClientCreationError"/> instance for backward compatibility.</summary>
     public static Iox2Error ClientCreationFailed => new ClientCreationError();
-    
+
     /// <summary>Gets a <see cref="ServerCreationError"/> instance for backward compatibility.</summary>
     public static Iox2Error ServerCreationFailed => new ServerCreationError();
-    
+
     /// <summary>Gets a <see cref="RequestLoanError"/> instance for backward compatibility.</summary>
     public static Iox2Error RequestLoanFailed => new RequestLoanError();
-    
+
     /// <summary>Gets a <see cref="RequestSendError"/> instance for backward compatibility.</summary>
     public static Iox2Error RequestSendFailed => new RequestSendError();
-    
+
     /// <summary>Gets a <see cref="ResponseLoanError"/> instance for backward compatibility.</summary>
     public static Iox2Error ResponseLoanFailed => new ResponseLoanError();
-    
+
     /// <summary>Gets a <see cref="ResponseSendError"/> instance for backward compatibility.</summary>
     public static Iox2Error ResponseSendFailed => new ResponseSendError();
-    
+
     /// <summary>Gets a <see cref="ResponseReceiveError"/> instance for backward compatibility.</summary>
     public static Iox2Error ResponseReceiveFailed => new ResponseReceiveError();
-    
+
     /// <summary>Gets an <see cref="InvalidHandleError"/> instance for backward compatibility.</summary>
     public static Iox2Error InvalidHandle => new InvalidHandleError();
-    
+
     /// <summary>Gets a <see cref="WaitSetCreationError"/> instance for backward compatibility.</summary>
     public static Iox2Error WaitSetCreationFailed => new WaitSetCreationError();
-    
+
     /// <summary>Gets a <see cref="WaitSetAttachmentError"/> instance for backward compatibility.</summary>
     public static Iox2Error WaitSetAttachmentFailed => new WaitSetAttachmentError();
-    
+
     /// <summary>Gets a <see cref="WaitSetRunError"/> instance for backward compatibility.</summary>
     public static Iox2Error WaitSetRunFailed => new WaitSetRunError();
-    
+
     /// <summary>Gets a <see cref="ConnectionUpdateError"/> instance for backward compatibility.</summary>
     public static Iox2Error ConnectionUpdateFailed => new ConnectionUpdateError();
-    
+
     /// <summary>Gets an <see cref="UnknownError"/> instance for backward compatibility.</summary>
     public static Iox2Error Unknown => new UnknownError();
 }

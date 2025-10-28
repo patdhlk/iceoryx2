@@ -150,14 +150,14 @@ class Program
         // Wait for senders to complete
         await Task.WhenAll(senderTask1, senderTask2);
         Console.WriteLine("\n✓ All events sent");
-        
+
         // Give receiver time to process remaining events
         await Task.Delay(1000);
 
         // Shutdown
         Console.WriteLine("\nShutting down...");
         cts.Cancel();
-        
+
         // Wait briefly for receiver to stop
         await Task.Delay(500);
 

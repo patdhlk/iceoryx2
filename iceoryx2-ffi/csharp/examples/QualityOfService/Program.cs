@@ -96,13 +96,13 @@ class Program
             .Expect("Failed to create subscriber");
 
         Console.WriteLine("✓ Subscriber created with buffer size 10");
-        
+
         // CRITICAL: Publisher must explicitly update connections to deliver history
         Console.WriteLine("✓ Updating publisher connections to deliver history...");
         publisher.UpdateConnections().Expect("Failed to update connections");
 
         Console.WriteLine("\nReceiving historical samples:");
-        
+
         // Receive the historical samples
         for (int i = 0; i < 5; i++)
         {
@@ -129,7 +129,7 @@ class Program
         }
 
         Console.WriteLine("\nReceiving samples (oldest 5 should be overwritten):");
-        
+
         int received = 0;
         while (received < 10) // Buffer size is 10
         {

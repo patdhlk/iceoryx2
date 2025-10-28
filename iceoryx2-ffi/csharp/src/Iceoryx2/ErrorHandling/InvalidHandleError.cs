@@ -20,17 +20,17 @@ namespace Iceoryx2.ErrorHandling
         /// Gets the type of handle that was invalid (e.g., "Publisher", "Subscriber"), if available.
         /// </summary>
         public string? HandleType { get; }
-        
+
         /// <summary>
         /// Gets the error kind for pattern matching.
         /// </summary>
         public override Iox2ErrorKind Kind => Iox2ErrorKind.InvalidHandle;
-        
+
         /// <summary>
         /// Gets additional details about the invalid handle.
         /// </summary>
         public override string? Details { get; }
-        
+
         /// <summary>
         /// Gets a human-readable error message including handle type if available.
         /// </summary>

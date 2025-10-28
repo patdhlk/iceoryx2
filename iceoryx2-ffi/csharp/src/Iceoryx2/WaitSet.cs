@@ -209,14 +209,14 @@ public sealed class WaitSet : IDisposable
     {
         return WaitAndProcessInternal(callback, disposeAttachments: true);
     }    /// <summary>
-    /// Waits for ONE event and processes it, then returns.
-    /// Useful for event loops where you want explicit control over each iteration.
-    /// </summary>
-    /// <param name="callback">
-    /// Callback invoked for the event. Receives the WaitSetAttachmentId which must be disposed.
-    /// Return CallbackProgression.Continue to process the event, or CallbackProgression.Stop to skip it.
-    /// </param>
-    /// <returns>Result indicating the outcome, or an error.</returns>
+         /// Waits for ONE event and processes it, then returns.
+         /// Useful for event loops where you want explicit control over each iteration.
+         /// </summary>
+         /// <param name="callback">
+         /// Callback invoked for the event. Receives the WaitSetAttachmentId which must be disposed.
+         /// Return CallbackProgression.Continue to process the event, or CallbackProgression.Stop to skip it.
+         /// </param>
+         /// <returns>Result indicating the outcome, or an error.</returns>
     public Result<WaitSetRunResult, Iox2Error> WaitAndProcessOnce(Func<WaitSetAttachmentId, CallbackProgression> callback)
     {
         ThrowIfDisposed();
@@ -352,12 +352,12 @@ public sealed class WaitSet : IDisposable
         while (!cancellationToken.IsCancellationRequested)
         {
             var events = await ProcessEventsOnceAsync(cancellationToken).ConfigureAwait(false);
-            
+
             foreach (var evt in events)
             {
                 if (cancellationToken.IsCancellationRequested)
                     yield break;
-                    
+
                 yield return evt;
             }
         }
@@ -442,10 +442,10 @@ public sealed class WaitSet : IDisposable
                 if (result.IsOk)
                 {
                     var runResult = result.Unwrap();
-                    
+
                     // StopRequest is expected when we return Stop from callback after collecting an event
                     // Only treat signals (TerminationRequest/Interrupt) as cancellation
-                    if (runResult == WaitSetRunResult.TerminationRequest || 
+                    if (runResult == WaitSetRunResult.TerminationRequest ||
                         runResult == WaitSetRunResult.Interrupt ||
                         (cancellationToken.IsCancellationRequested && events.Count == 0))
                     {
@@ -492,7 +492,7 @@ public sealed class WaitSet : IDisposable
             try
             {
                 var attachmentId = new WaitSetAttachmentId(new SafeWaitSetAttachmentIdHandle(attachmentIdHandle));
-                
+
                 if (disposeAttachments)
                 {
                     using (attachmentId)

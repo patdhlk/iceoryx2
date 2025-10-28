@@ -19,12 +19,12 @@ namespace Iceoryx2.ErrorHandling
         /// Gets the error kind for pattern matching.
         /// </summary>
         public override Iox2ErrorKind Kind => Iox2ErrorKind.SubscriberCreationFailed;
-        
+
         /// <summary>
         /// Gets additional details about why subscriber creation failed.
         /// </summary>
         public override string? Details { get; }
-        
+
         /// <summary>
         /// Gets a human-readable error message.
         /// </summary>

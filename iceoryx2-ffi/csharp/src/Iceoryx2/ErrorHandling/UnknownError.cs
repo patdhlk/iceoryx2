@@ -20,13 +20,13 @@ namespace Iceoryx2.ErrorHandling
         /// Gets the error kind for pattern matching.
         /// </summary>
         public override Iox2ErrorKind Kind => Iox2ErrorKind.Unknown;
-        
+
         /// <summary>
         /// Gets additional details about the unknown error, if available.
         /// This may contain diagnostic information to help identify the root cause.
         /// </summary>
         public override string? Details { get; }
-        
+
         /// <summary>
         /// Gets a human-readable error message.
         /// </summary>
