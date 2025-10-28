@@ -532,6 +532,37 @@ internal static partial class Iox2NativeMethods
         ulong type_size,
         ulong type_alignment);
 
+    // QoS Settings for Publish-Subscribe Service Builder
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern void iox2_service_builder_pub_sub_set_max_subscribers(
+        ref IntPtr service_builder_pub_sub_handle,
+        UIntPtr value);
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern void iox2_service_builder_pub_sub_set_max_publishers(
+        ref IntPtr service_builder_pub_sub_handle,
+        UIntPtr value);
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern void iox2_service_builder_pub_sub_set_subscriber_max_buffer_size(
+        ref IntPtr service_builder_pub_sub_handle,
+        UIntPtr value);
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern void iox2_service_builder_pub_sub_set_subscriber_max_borrowed_samples(
+        ref IntPtr service_builder_pub_sub_handle,
+        UIntPtr value);
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern void iox2_service_builder_pub_sub_set_history_size(
+        ref IntPtr service_builder_pub_sub_handle,
+        UIntPtr value);
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern void iox2_service_builder_pub_sub_set_enable_safe_overflow(
+        ref IntPtr service_builder_pub_sub_handle,
+        [MarshalAs(UnmanagedType.I1)] bool value);
+
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
     internal static extern int iox2_service_builder_pub_sub_open_or_create(
         IntPtr service_builder_pub_sub_handle,
@@ -559,6 +590,12 @@ internal static partial class Iox2NativeMethods
     // Publisher API
     // ========================================
 
+    // QoS Settings for Publisher Builder
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern void iox2_port_factory_publisher_builder_set_max_loaned_samples(
+        ref IntPtr publisher_builder_handle,
+        UIntPtr value);
+
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
     internal static extern int iox2_port_factory_publisher_builder_create(
         IntPtr publisher_builder_handle,
@@ -567,6 +604,9 @@ internal static partial class Iox2NativeMethods
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
     internal static extern void iox2_publisher_drop(IntPtr publisher_handle);
+
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern int iox2_publisher_update_connections(ref IntPtr publisher_handle);
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
     internal static extern int iox2_publisher_loan_slice_uninit(
@@ -590,6 +630,12 @@ internal static partial class Iox2NativeMethods
     // ========================================
     // Subscriber API
     // ========================================
+
+    // Subscriber Builder QoS
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern void iox2_port_factory_subscriber_builder_set_buffer_size(
+        ref IntPtr subscriber_builder_handle,
+        UIntPtr value);
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
     internal static extern int iox2_port_factory_subscriber_builder_create(

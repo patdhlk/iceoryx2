@@ -213,6 +213,70 @@ public sealed class Publisher : IDisposable
     }
 
     /// <summary>
+    /// Explicitly updates all connections to the Subscribers. This is
+    /// required to be called whenever a new Subscriber is connected to
+    /// the service. It is called implicitly whenever Sample.Send() or
+    /// Publisher.SendCopy() is called.
+    /// When a Subscriber is connected that requires a history this
+    /// call will deliver it.
+    /// </summary>
+    /// <returns>Result indicating success or connection failure</returns>
+    /// <remarks>
+    /// This method is critical for history delivery. When a service is configured
+    /// with a history size and a new subscriber connects, the publisher must
+    /// explicitly call UpdateConnections() to deliver the historical samples
+    /// to the newly connected subscriber.
+    /// 
+    /// Example:
+    /// <code>
+    /// // Service configured with history
+    /// var service = node.ServiceBuilder(serviceName)
+    ///     .PublishSubscribe&lt;ulong&gt;()
+    ///     .HistorySize(5)
+    ///     .Open();
+    /// 
+    /// var publisher = service.PublisherBuilder().Create();
+    /// 
+    /// // Send some samples
+    /// for (ulong i = 1; i &lt;= 5; i++) {
+    ///     publisher.Send(i);
+    /// }
+    /// 
+    /// // Late-joining subscriber
+    /// var subscriber = service.SubscriberBuilder()
+    ///     .BufferSize(10)
+    ///     .Create();
+    /// 
+    /// // REQUIRED: Update connections to deliver history
+    /// publisher.UpdateConnections();
+    /// 
+    /// // Now subscriber can receive the 5 historical samples
+    /// while (var sample = subscriber.Receive()) {
+    ///     Console.WriteLine($"History: {sample.Payload}");
+    /// }
+    /// </code>
+    /// </remarks>
+    public Result<Unit, Iox2Error> UpdateConnections()
+    {
+        ThrowIfDisposed();
+
+        try
+        {
+            var publisherHandle = _handle.DangerousGetHandle();
+            var result = Native.Iox2NativeMethods.iox2_publisher_update_connections(ref publisherHandle);
+
+            if (result != Native.Iox2NativeMethods.IOX2_OK)
+                return Result<Unit, Iox2Error>.Err(Iox2Error.ConnectionUpdateFailed);
+
+            return Result<Unit, Iox2Error>.Ok(Unit.Value);
+        }
+        catch (Exception)
+        {
+            return Result<Unit, Iox2Error>.Err(Iox2Error.ConnectionUpdateFailed);
+        }
+    }
+
+    /// <summary>
     /// Disposes of the resources used by the Publisher instance.
     /// </summary>
     public void Dispose()

@@ -89,7 +89,8 @@ class ProgramAsync
         Console.WriteLine("Service opened");
 
         // Create a subscriber
-        using var subscriber = service.CreateSubscriber()
+        using var subscriber = service.SubscriberBuilder()
+            .Create()
             .Expect("Failed to create subscriber");
 
         Console.WriteLine("Subscriber created\n");
@@ -152,7 +153,8 @@ class ProgramAsync
         Console.WriteLine("Service opened");
 
         // Create a subscriber
-        using var subscriber = service.CreateSubscriber()
+        using var subscriber = service.SubscriberBuilder()
+            .Create()
             .Expect("Failed to create subscriber");
 
         Console.WriteLine("Subscriber created\n");
@@ -210,9 +212,9 @@ class ProgramAsync
             .Expect("Failed to open service");
 
         // Create multiple subscribers
-        using var subscriber1 = service.CreateSubscriber().Expect("Failed to create subscriber 1");
-        using var subscriber2 = service.CreateSubscriber().Expect("Failed to create subscriber 2");
-        using var subscriber3 = service.CreateSubscriber().Expect("Failed to create subscriber 3");
+        using var subscriber1 = service.SubscriberBuilder().Create().Expect("Failed to create subscriber 1");
+        using var subscriber2 = service.SubscriberBuilder().Create().Expect("Failed to create subscriber 2");
+        using var subscriber3 = service.SubscriberBuilder().Create().Expect("Failed to create subscriber 3");
 
         Console.WriteLine("Created 3 subscribers\n");
 

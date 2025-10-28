@@ -230,7 +230,8 @@ class Program
             .Expect("Failed to open service");
 
         // Create a subscriber
-        using var subscriber = service.CreateSubscriber()
+        using var subscriber = service.SubscriberBuilder()
+            .Create()
             .Expect("Failed to create subscriber");
 
         Console.WriteLine("Subscriber created. Waiting for samples...\n");

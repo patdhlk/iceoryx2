@@ -134,7 +134,8 @@ class Program
             .Open(serviceName)
             .Expect($"Failed to open service '{serviceName}'");
 
-        var subscriber = service.CreateSubscriber()
+        var subscriber = service.SubscriberBuilder()
+            .Create()
             .Expect("Failed to create subscriber");
 
         var cts = new CancellationTokenSource();

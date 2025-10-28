@@ -59,6 +59,7 @@ public abstract class Iox2Error
             Iox2ErrorKind.WaitSetCreationFailed => new WaitSetCreationError(details),
             Iox2ErrorKind.WaitSetAttachmentFailed => new WaitSetAttachmentError(details),
             Iox2ErrorKind.WaitSetRunFailed => new WaitSetRunError(details),
+            Iox2ErrorKind.ConnectionUpdateFailed => new ConnectionUpdateError(details),
             Iox2ErrorKind.Unknown => new UnknownError(details),
             _ => new UnknownError(details)
         };
@@ -137,6 +138,9 @@ public abstract class Iox2Error
     
     /// <summary>Gets a <see cref="WaitSetRunError"/> instance for backward compatibility.</summary>
     public static Iox2Error WaitSetRunFailed => new WaitSetRunError();
+    
+    /// <summary>Gets a <see cref="ConnectionUpdateError"/> instance for backward compatibility.</summary>
+    public static Iox2Error ConnectionUpdateFailed => new ConnectionUpdateError();
     
     /// <summary>Gets an <see cref="UnknownError"/> instance for backward compatibility.</summary>
     public static Iox2Error Unknown => new UnknownError();

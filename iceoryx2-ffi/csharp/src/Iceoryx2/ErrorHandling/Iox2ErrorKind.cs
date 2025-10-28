@@ -53,6 +53,8 @@ namespace Iceoryx2.ErrorHandling
         WaitSetAttachmentFailed,
         /// <summary>WaitSet run operation failed.</summary>
         WaitSetRunFailed,
+        /// <summary>Connection update failed.</summary>
+        ConnectionUpdateFailed,
         /// <summary>Unknown error.</summary>
         Unknown
     }

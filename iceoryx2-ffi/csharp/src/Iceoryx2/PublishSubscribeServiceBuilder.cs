@@ -10,10 +10,86 @@ public sealed class PublishSubscribeServiceBuilder<T> where T : unmanaged
 {
     private readonly Node _node;
     private string? _serviceName;
+    private ulong? _maxSubscribers;
+    private ulong? _maxPublishers;
+    private ulong? _subscriberMaxBufferSize;
+    private ulong? _subscriberMaxBorrowedSamples;
+    private ulong? _historySize;
+    private bool? _enableSafeOverflow;
 
     internal PublishSubscribeServiceBuilder(Node node)
     {
         _node = node ?? throw new ArgumentNullException(nameof(node));
+    }
+
+    /// <summary>
+    /// Sets the maximum number of subscribers that can connect to this service.
+    /// </summary>
+    /// <param name="value">Maximum number of subscribers (default: 8)</param>
+    /// <returns>This builder for method chaining</returns>
+    public PublishSubscribeServiceBuilder<T> MaxSubscribers(ulong value)
+    {
+        _maxSubscribers = value;
+        return this;
+    }
+
+    /// <summary>
+    /// Sets the maximum number of publishers that can connect to this service.
+    /// </summary>
+    /// <param name="value">Maximum number of publishers (default: 2)</param>
+    /// <returns>This builder for method chaining</returns>
+    public PublishSubscribeServiceBuilder<T> MaxPublishers(ulong value)
+    {
+        _maxPublishers = value;
+        return this;
+    }
+
+    /// <summary>
+    /// Sets the maximum buffer size for each subscriber.
+    /// This defines how many samples a subscriber can store in its internal buffer.
+    /// </summary>
+    /// <param name="value">Maximum buffer size per subscriber (default: 2)</param>
+    /// <returns>This builder for method chaining</returns>
+    public PublishSubscribeServiceBuilder<T> SubscriberMaxBufferSize(ulong value)
+    {
+        _subscriberMaxBufferSize = value;
+        return this;
+    }
+
+    /// <summary>
+    /// Sets the maximum number of samples a subscriber can borrow simultaneously.
+    /// </summary>
+    /// <param name="value">Maximum borrowed samples per subscriber (default: 2)</param>
+    /// <returns>This builder for method chaining</returns>
+    public PublishSubscribeServiceBuilder<T> SubscriberMaxBorrowedSamples(ulong value)
+    {
+        _subscriberMaxBorrowedSamples = value;
+        return this;
+    }
+
+    /// <summary>
+    /// Sets the history size for late-joining subscribers.
+    /// When a subscriber connects, it can receive up to this many historical samples.
+    /// </summary>
+    /// <param name="value">History size (default: 0)</param>
+    /// <returns>This builder for method chaining</returns>
+    public PublishSubscribeServiceBuilder<T> HistorySize(ulong value)
+    {
+        _historySize = value;
+        return this;
+    }
+
+    /// <summary>
+    /// Enables or disables safe overflow behavior.
+    /// When enabled and a subscriber's buffer is full, the oldest sample will be overridden by the newest one.
+    /// When disabled, the publisher will block or apply the unable-to-deliver strategy.
+    /// </summary>
+    /// <param name="value">True to enable safe overflow, false to disable (default: true)</param>
+    /// <returns>This builder for method chaining</returns>
+    public PublishSubscribeServiceBuilder<T> EnableSafeOverflow(bool value)
+    {
+        _enableSafeOverflow = value;
+        return this;
     }
 
     /// <summary>
@@ -55,6 +131,43 @@ public sealed class PublishSubscribeServiceBuilder<T> where T : unmanaged
 
             // Get pub/sub builder
             var pubSubBuilderHandle = Native.Iox2NativeMethods.iox2_service_builder_pub_sub(serviceBuilderHandle);
+
+            // Apply QoS settings if specified
+            if (_maxSubscribers.HasValue)
+            {
+                Native.Iox2NativeMethods.iox2_service_builder_pub_sub_set_max_subscribers(
+                    ref pubSubBuilderHandle, new UIntPtr(_maxSubscribers.Value));
+            }
+
+            if (_maxPublishers.HasValue)
+            {
+                Native.Iox2NativeMethods.iox2_service_builder_pub_sub_set_max_publishers(
+                    ref pubSubBuilderHandle, new UIntPtr(_maxPublishers.Value));
+            }
+
+            if (_subscriberMaxBufferSize.HasValue)
+            {
+                Native.Iox2NativeMethods.iox2_service_builder_pub_sub_set_subscriber_max_buffer_size(
+                    ref pubSubBuilderHandle, new UIntPtr(_subscriberMaxBufferSize.Value));
+            }
+
+            if (_subscriberMaxBorrowedSamples.HasValue)
+            {
+                Native.Iox2NativeMethods.iox2_service_builder_pub_sub_set_subscriber_max_borrowed_samples(
+                    ref pubSubBuilderHandle, new UIntPtr(_subscriberMaxBorrowedSamples.Value));
+            }
+
+            if (_historySize.HasValue)
+            {
+                Native.Iox2NativeMethods.iox2_service_builder_pub_sub_set_history_size(
+                    ref pubSubBuilderHandle, new UIntPtr(_historySize.Value));
+            }
+
+            if (_enableSafeOverflow.HasValue)
+            {
+                Native.Iox2NativeMethods.iox2_service_builder_pub_sub_set_enable_safe_overflow(
+                    ref pubSubBuilderHandle, _enableSafeOverflow.Value);
+            }
 
             // Set payload type details
             // Use Rust-compatible type names for cross-language interoperability

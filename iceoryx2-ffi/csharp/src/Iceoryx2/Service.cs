@@ -30,7 +30,28 @@ public sealed class Service : IDisposable
     }
 
     /// <summary>
-    /// Creates a publisher for this service.
+    /// Gets a builder for creating publishers with custom QoS settings.
+    /// </summary>
+    /// <returns>A PublisherBuilder instance for configuring and creating a publisher</returns>
+    public PublisherBuilder PublisherBuilder()
+    {
+        ThrowIfDisposed();
+        return new PublisherBuilder(this);
+    }
+
+    /// <summary>
+    /// Gets a builder for creating subscribers with custom buffer configuration.
+    /// </summary>
+    /// <returns>A SubscriberBuilder instance for configuring and creating a subscriber</returns>
+    public SubscriberBuilder SubscriberBuilder()
+    {
+        ThrowIfDisposed();
+        return new SubscriberBuilder(this);
+    }
+
+    /// <summary>
+    /// Creates a publisher for this service with default settings.
+    /// For custom QoS settings, use PublisherBuilder() instead.
     /// </summary>
     public Result<Publisher, Iox2Error> CreatePublisher()
     {
@@ -68,7 +89,8 @@ public sealed class Service : IDisposable
     }
 
     /// <summary>
-    /// Creates a subscriber for this service.
+    /// Creates a subscriber for this service with default settings.
+    /// For custom buffer configuration, use SubscriberBuilder() instead.
     /// </summary>
     public Result<Subscriber, Iox2Error> CreateSubscriber()
     {
@@ -123,5 +145,14 @@ public sealed class Service : IDisposable
     {
         if (_disposed)
             throw new ObjectDisposedException(nameof(Service));
+    }
+
+    /// <summary>
+    /// Internal method to get the underlying handle for builder classes.
+    /// </summary>
+    internal SafeServiceHandle GetHandle()
+    {
+        ThrowIfDisposed();
+        return _handle;
     }
 }

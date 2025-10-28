@@ -126,7 +126,8 @@ class Program
 
         Console.WriteLine("Service opened");
 
-        using var subscriber = service.CreateSubscriber()
+        using var subscriber = service.SubscriberBuilder()
+            .Create()
             .Expect("Failed to create subscriber");
 
         Console.WriteLine("Subscriber created");
@@ -180,7 +181,8 @@ class Program
 
         Console.WriteLine("Service opened");
 
-        using var subscriber = service.CreateSubscriber()
+        using var subscriber = service.SubscriberBuilder()
+            .Create()
             .Expect("Failed to create subscriber");
 
         Console.WriteLine("Subscriber created");
@@ -222,9 +224,9 @@ class Program
             .Open("MyAsyncService")
             .Expect("Failed to open service");
 
-        using var subscriber1 = service.CreateSubscriber().Expect("Failed to create subscriber 1");
-        using var subscriber2 = service.CreateSubscriber().Expect("Failed to create subscriber 2");
-        using var subscriber3 = service.CreateSubscriber().Expect("Failed to create subscriber 3");
+        using var subscriber1 = service.SubscriberBuilder().Create().Expect("Failed to create subscriber 1");
+        using var subscriber2 = service.SubscriberBuilder().Create().Expect("Failed to create subscriber 2");
+        using var subscriber3 = service.SubscriberBuilder().Create().Expect("Failed to create subscriber 3");
 
         Console.WriteLine("Created 3 subscribers");
         Console.WriteLine("Each subscriber will process data concurrently");
