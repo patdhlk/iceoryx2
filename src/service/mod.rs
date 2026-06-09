@@ -590,6 +590,12 @@ pub mod internal {
         origin: &str,
         msg: &str,
     ) {
+        // Bring the container `String` trait into scope for `as_str` below.
+        // The module-level `use alloc::string::String` shadows the name, so it
+        // is imported as `_` purely for method resolution (newer rustc no
+        // longer auto-resolves the trait method otherwise).
+        use iceoryx2_bb_container::string::String as _;
+
         match unsafe {
             <S::BlackboardPayload as NamedConceptMgmt>::remove_cfg(
                 blackboard_name,
