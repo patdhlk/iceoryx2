@@ -216,7 +216,6 @@
 use core::{fmt::Debug, hash::Hash, marker::PhantomData, time::Duration};
 
 use alloc::collections::BTreeMap;
-use alloc::vec;
 use alloc::vec::Vec;
 
 use iceoryx2_bb_concurrency::atomic::AtomicUsize;
@@ -504,6 +503,10 @@ impl WaitSetBuilder {
 
         match <Service::Reactor as Reactor>::Builder::new().create() {
             Ok(reactor) => Ok(WaitSet {
+                // Pre-size the reused scratch buffer to the reactor capacity so even the
+                // first wait performs no allocation for the triggered-fd collection
+                // (REQ_0104 zero-alloc dispatch).
+                triggered_fds_scratch: RefCell::new(Vec::with_capacity(reactor.capacity())),
                 reactor,
                 deadline_queue,
                 attachment_to_deadline: RefCell::new(BTreeMap::new()),
@@ -540,6 +543,12 @@ pub struct WaitSet<Service: crate::service::Service> {
     deadline_queue: DeadlineQueue,
     attachment_to_deadline: RefCell<BTreeMap<i32, DeadlineQueueIndex>>,
     deadline_to_attachment: RefCell<BTreeMap<DeadlineQueueIndex, i32>>,
+    /// Reused scratch buffer for the per-wait set of triggered fds. Held on the
+    /// WaitSet (not allocated per call) so steady-state fd-notification dispatch
+    /// performs no heap allocation (REQ_0104 zero-alloc dispatch). Cleared at the
+    /// start of each wait; capacity is bounded by the reactor capacity, so after
+    /// the first growth (absorbed during warmup) it never reallocates.
+    triggered_fds_scratch: RefCell<Vec<i32>>,
     attachment_counter: AtomicUsize,
     signal_handling_mode: SignalHandlingMode,
 }
@@ -621,10 +630,15 @@ impl<Service: crate::service::Service> WaitSet<Service> {
     ) -> Result<WaitSetRunResult, WaitSetRunError> {
         // we need to reset the deadlines first, otherwise a long fn_call may extend the
         // deadline unintentionally
-        let mut fd_and_deadline_queue_idx = Vec::with_capacity(triggered_file_descriptors.len());
-
+        //
+        // REQ_0104 (zero-alloc steady-state): the previous (fd, deadline_idx) collection
+        // Vec was written but never read downstream — handle_deadlines and the second
+        // notification loop below both iterate `triggered_file_descriptors`, not the
+        // collected tuples. Only the reset_deadline side effect (and its `?` early-return
+        // on error) matters, so we drop the dead Vec and keep a plain reset loop. Behavior
+        // is identical: same fds reset, same order, same error propagation.
         for fd in triggered_file_descriptors {
-            fd_and_deadline_queue_idx.push((fd, self.reset_deadline(*fd)?));
+            self.reset_deadline(*fd)?;
         }
 
         // must be called after the deadlines have been reset, in the case that the
@@ -902,7 +916,13 @@ impl<Service: crate::service::Service> WaitSet<Service> {
                                  "{msg} since the next timeout could not be acquired.");
         let next_timeout = next_timeout.min(timeout);
 
-        let mut triggered_file_descriptors = vec![];
+        // REQ_0104 (zero-alloc steady-state): reuse the scratch buffer held on the
+        // WaitSet instead of allocating a fresh Vec per call. Cleared here, then filled
+        // by the collect closure below; after warmup its capacity covers all triggered
+        // fds so no reallocation occurs.
+        let mut triggered_file_descriptors = self.triggered_fds_scratch.borrow_mut();
+        triggered_file_descriptors.clear();
+        let triggered_file_descriptors = &mut *triggered_file_descriptors;
         let collect_triggered_fds = |fd: &FileDescriptor| {
             let fd = unsafe { fd.native_handle() };
             triggered_file_descriptors.push(fd);
